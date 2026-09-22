@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Ohm's Law Calculator | WolfWorks Engineering Toolkit{% endblock %}
+
+{% block content %}
+
+<h1>Ohm's Law Calculator</h1>
+
+<p>
+    Enter exactly two known values. The remaining electrical
+    quantities will be calculated automatically.
+</p>
+
+<form method="POST">
+
+    <div>
+        <label for="voltage">Voltage (V)</label>
+        <input
+            type="number"
+            step="any"
+            id="voltage"
+            name="voltage"
+        >
+    </div>
+
+    <div>
+        <label for="current">Current (A)</label>
+        <input
+            type="number"
+            step="any"
+            id="current"
+            name="current"
+        >
+    </div>
+
+    <div>
+        <label for="resistance">Resistance (Ω)</label>
+        <input
+            type="number"
+            step="any"
+            id="resistance"
+            name="resistance"
+        >
+    </div>
+
+    <div>
+        <label for="power">Power (W)</label>
+        <input
+            type="number"
+            step="any"
+            id="power"
+            name="power"
+        >
+    </div>
+
+    <button type="submit">Calculate</button>
+
+</form>
+
+
+{% if error %}
+
+<div class="error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+{% if result %}
+
+<section class="result">
+
+    <h2>Results</h2>
+
+    <table>
+        <tr>
+            <th>Quantity</th>
+            <th>Value</th>
+            <th>Unit</th>
+        </tr>
+
+        <tr>
+            <td>Voltage</td>
+            <td>{{ "%.4g"|format(result.voltage) }}</td>
+            <td>V</td>
+        </tr>
+
+        <tr>
+            <td>Current</td>
+            <td>{{ "%.4g"|format(result.current) }}</td>
+            <td>A</td>
+        </tr>
+
+        <tr>
+            <td>Resistance</td>
+            <td>{{ "%.4g"|format(result.resistance) }}</td>
+            <td>Ω</td>
+        </tr>
+
+        <tr>
+            <td>Power</td>
+            <td>{{ "%.4g"|format(result.power) }}</td>
+            <td>W</td>
+        </tr>
+
+    </table>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Electrical Tools | WolfWorks Engineering Toolkit{% endblock %}
+
+{% block content %}
+
+<h1>Electrical Engineering Tools</h1>
+
+<p>
+    Calculators and utilities for common electrical engineering
+    and industrial control applications.
+</p>
+
+<h2>Calculators</h2>
+
+<ul>
+    <li>
+        <a href="{{ url_for('electrical.ohms_law') }}">
+            Ohm's Law Calculator
+        </a>
+    </li>
+
+    <li>Voltage Divider</li>
+    <li>Series / Parallel Resistance</li>
+    <li>ADC Calculator</li>
+    <li>DAC Calculator</li>
+    <li>Industrial Analog Scaling</li>
+</ul>
+
+{% endblock %}

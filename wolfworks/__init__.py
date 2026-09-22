@@ -14,4 +14,7 @@ def create_app():
     from wolfworks.core import core_bp
     app.register_blueprint(core_bp)
 
+    from wolfworks.electrical import electrical_bp
+    app.register_blueprint(electrical_bp)
+
     return app

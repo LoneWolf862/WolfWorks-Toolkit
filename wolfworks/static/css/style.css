@@ -45,3 +45,56 @@ footer {
     padding: 2rem;
     color: #66717e;
 }
+
+
+
+
+
+form {
+    max-width: 500px;
+    margin: 2rem 0;
+}
+
+form div {
+    margin-bottom: 1rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem;
+}
+
+button {
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+}
+
+.error {
+    max-width: 500px;
+    margin: 1rem 0;
+    padding: 1rem;
+    border: 1px solid #a33;
+}
+
+.result {
+    margin-top: 2rem;
+}
+
+table {
+    border-collapse: collapse;
+    min-width: 400px;
+}
+
+th,
+td {
+    padding: 0.6rem 1rem;
+    border: 1px solid #bbb;
+    text-align: left;
+}
