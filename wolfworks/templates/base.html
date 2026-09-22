@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}WolfWorks Engineering Toolkit{% endblock %}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('core.home') }}">
+                WolfWorks Engineering Toolkit
+            </a>
+
+            <ul>
+                <li><a href="#">Electrical</a></li>
+                <li><a href="#">PLC</a></li>
+                <li><a href="#">Server</a></li>
+                <li><a href="#">File Formats</a></li>
+                <li><a href="#">Networking</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>WolfWorks Engineering Toolkit</p>
+    </footer>
+</body>
+</html>
