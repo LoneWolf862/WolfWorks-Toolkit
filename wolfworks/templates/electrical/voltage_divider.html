@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Voltage Divider | WolfWorks Engineering Toolkit{% endblock %}
+
+{% block content %}
+
+<h1>Voltage Divider Calculator</h1>
+
+<p>
+    Calculate the output voltage, circuit current, voltage drops,
+    and resistor power for a two-resistor voltage divider.
+</p>
+
+<form method="POST">
+
+	<div class="calculator-layout">
+
+		<div class="calculator-panel">
+
+			<form method="POST">
+
+				<div>
+					<label for="input_voltage">Input Voltage (V)</label>
+					<input
+						type="number"
+						step="any"
+						id="input_voltage"
+						name="input_voltage"
+						value="{{ request.form.get('input_voltage', '') }}"
+						required
+					>
+				</div>
+
+				<div>
+					<label for="resistor_1">R1 (Ω)</label>
+					<input
+						type="number"
+						step="any"
+						id="resistor_1"
+						name="resistor_1"
+						value="{{ request.form.get('resistor_1', '') }}"
+						required
+					>
+				</div>
+
+				<div>
+					<label for="resistor_2">R2 (Ω)</label>
+					<input
+						type="number"
+						step="any"
+						id="resistor_2"
+						name="resistor_2"
+						value="{{ request.form.get('resistor_2', '') }}"
+						required
+					>
+				</div>
+
+				<button type="submit">Calculate</button>
+
+			</form>
+
+			{% if error %}
+			<div class="error">
+				<strong>Error:</strong>
+				{{ error }}
+			</div>
+			{% endif %}
+
+		</div>
+
+		<div class="calculator-diagram">
+			<img
+				src="{{ url_for('static', filename='images/VoltageDivider.JPG') }}"
+				alt="Voltage divider circuit showing input voltage, R1, R2, and output voltage"
+			>
+		</div>
+
+	</div>
+
+</form>
+
+
+
+
+{% if result %}
+
+<section class="result">
+
+    <h2>Calculation</h2>
+
+    <div class="result-tables">
+
+        <div>
+            <h3>Input Values</h3>
+
+            <table>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                </tr>
+
+                <tr>
+                    <td>Input Voltage</td>
+                    <td>{{ "%.6g"|format(result.input_voltage) }}</td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>R1</td>
+                    <td>{{ "%.6g"|format(result.resistor_1) }}</td>
+                    <td>Ω</td>
+                </tr>
+
+                <tr>
+                    <td>R2</td>
+                    <td>{{ "%.6g"|format(result.resistor_2) }}</td>
+                    <td>Ω</td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div>
+            <h3>Results</h3>
+
+            <table>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                </tr>
+
+                <tr>
+                    <td>Output Voltage</td>
+                    <td>{{ "%.6g"|format(result.output_voltage) }}</td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>Circuit Current</td>
+                    <td>{{ "%.6g"|format(result.current) }}</td>
+                    <td>A</td>
+                </tr>
+
+                <tr>
+                    <td>R1 Voltage Drop</td>
+                    <td>{{ "%.6g"|format(result.voltage_r1) }}</td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>R2 Voltage Drop</td>
+                    <td>{{ "%.6g"|format(result.voltage_r2) }}</td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>R1 Power</td>
+                    <td>{{ "%.6g"|format(result.power_r1) }}</td>
+                    <td>W</td>
+                </tr>
+
+                <tr>
+                    <td>R2 Power</td>
+                    <td>{{ "%.6g"|format(result.power_r2) }}</td>
+                    <td>W</td>
+                </tr>
+
+                <tr>
+                    <td>Total Resistance</td>
+                    <td>{{ "%.6g"|format(result.total_resistance) }}</td>
+                    <td>Ω</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

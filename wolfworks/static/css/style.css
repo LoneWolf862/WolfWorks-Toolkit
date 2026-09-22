@@ -30,7 +30,7 @@ nav ul {
 }
 
 main {
-    max-width: 1100px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
 }
@@ -97,4 +97,101 @@ td {
     padding: 0.6rem 1rem;
     border: 1px solid #bbb;
     text-align: left;
+}
+
+.result-tables {
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.result-tables > div {
+    flex: 0 0 auto;
+}
+
+.result-tables table {
+    width: auto;
+    min-width: 350px;
+}
+
+.calculator-layout {
+    display: grid;
+    grid-template-columns: 500px 600px;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+.calculator-panel {
+    width: 100%;
+}
+
+.calculator-panel form {
+    margin-top: 0;
+    width: 100%;
+}
+
+.calculator-diagram {
+    width: 600px;
+}
+
+.calculator-diagram img {
+    display: block;
+    width: 600px;
+    height: auto;
+}
+
+@media (max-width: 1200px) {
+    .calculator-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .calculator-diagram {
+        width: 100%;
+    }
+
+    .calculator-diagram img {
+        width: 100%;
+        max-width: 600px;
+    }
+}
+
+
+
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+small {
+    display: block;
+    margin-top: 0.35rem;
+    color: #66717e;
+}
+
+.radio-group {
+    margin-bottom: 1rem;
+}
+
+.radio-group strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: normal;
+}
+
+.radio-option input[type="radio"] {
+    width: auto;
+    margin: 0;
 }
