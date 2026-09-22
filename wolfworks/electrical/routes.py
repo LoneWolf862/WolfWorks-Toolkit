@@ -7,6 +7,7 @@ from wolfworks.electrical.calculations import (
     calculate_resistance,
     calculate_adc,
     calculate_dac,
+    calculate_linear_scaling,
 )
 
 
@@ -174,4 +175,86 @@ def adc_dac():
         result=result,
         error=error,
         calculation_type=calculation_type,
+    )
+    
+    
+@electrical_bp.route("/analog-scaling/", methods=["GET", "POST"])
+def analog_scaling():
+    result = None
+    error = None
+
+    direction = "signal_to_engineering"
+    signal_unit = ""
+    engineering_unit = ""
+
+    if request.method == "POST":
+        try:
+            direction = request.form.get(
+                "direction",
+                "signal_to_engineering",
+            )
+
+            value_to_convert = float(
+                request.form["value_to_convert"]
+            )
+
+            signal_min = float(
+                request.form["signal_min"]
+            )
+
+            signal_max = float(
+                request.form["signal_max"]
+            )
+
+            engineering_min = float(
+                request.form["engineering_min"]
+            )
+
+            engineering_max = float(
+                request.form["engineering_max"]
+            )
+
+            signal_unit = request.form.get(
+                "signal_unit",
+                "",
+            ).strip()
+
+            engineering_unit = request.form.get(
+                "engineering_unit",
+                "",
+            ).strip()
+
+            if direction == "signal_to_engineering":
+                result = calculate_linear_scaling(
+                    value_to_convert,
+                    signal_min,
+                    signal_max,
+                    engineering_min,
+                    engineering_max,
+                )
+
+            elif direction == "engineering_to_signal":
+                result = calculate_linear_scaling(
+                    value_to_convert,
+                    engineering_min,
+                    engineering_max,
+                    signal_min,
+                    signal_max,
+                )
+
+            else:
+                raise ValueError(
+                    "Invalid scaling direction."
+                )
+
+        except (ValueError, KeyError) as exc:
+            error = str(exc)
+
+    return render_template(
+        "electrical/analog_scaling.html",
+        result=result,
+        error=error,
+        direction=direction,
+        signal_unit=signal_unit,
+        engineering_unit=engineering_unit,
     )

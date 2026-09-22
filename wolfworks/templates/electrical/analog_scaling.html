@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+{% block title %}
+Industrial Analog Scaling | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Industrial Analog Scaling</h1>
+
+<p>
+    Convert between analog or PLC signal values and engineering values
+    using configurable ranges.
+</p>
+
+
+<div class="scaling-layout">
+
+    <div class="scaling-panel">
+
+        <form method="POST">
+
+            <!-- Direction -->
+
+            <div class="radio-group">
+
+                <strong>Scaling Direction</strong>
+
+                <label class="radio-option">
+                    <input
+                        type="radio"
+                        name="direction"
+                        value="signal_to_engineering"
+                        {% if direction == "signal_to_engineering" %}
+                        checked
+                        {% endif %}
+                    >
+                    <span>Signal → Engineering</span>
+                </label>
+
+                <label class="radio-option">
+                    <input
+                        type="radio"
+                        name="direction"
+                        value="engineering_to_signal"
+                        {% if direction == "engineering_to_signal" %}
+                        checked
+                        {% endif %}
+                    >
+                    <span>Engineering → Signal</span>
+                </label>
+
+            </div>
+
+
+            <!-- Value -->
+
+            <div class="scaling-value">
+
+                <label for="value_to_convert">
+                    Value to Convert
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="value_to_convert"
+                    name="value_to_convert"
+                    value="{{ request.form.get('value_to_convert', '') }}"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Signal -->
+
+            <h2>Signal</h2>
+
+            <div>
+
+                <label for="signal_preset">
+                    Common Signal Range
+                </label>
+
+                <select id="signal_preset">
+
+                    <option value="custom">
+                        Custom
+                    </option>
+
+                    <option value="4-20ma">
+                        4–20 mA
+                    </option>
+
+                    <option value="0-20ma">
+                        0–20 mA
+                    </option>
+
+                    <option value="0-10v">
+                        0–10 V
+                    </option>
+
+                    <option value="0-5v">
+                        0–5 V
+                    </option>
+
+                    <option value="1-5v">
+                        1–5 V
+                    </option>
+
+                    <option value="-10-10v">
+                        ±10 V
+                    </option>
+
+                    <option value="0-4095">
+                        0–4095 Counts
+                    </option>
+
+                    <option value="0-32767">
+                        0–32767 Counts
+                    </option>
+
+                    <option value="0-65535">
+                        0–65535 Counts
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label for="signal_min">
+                    Signal Minimum
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="signal_min"
+                    name="signal_min"
+                    value="{{ request.form.get('signal_min', '4') }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="signal_max">
+                    Signal Maximum
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="signal_max"
+                    name="signal_max"
+                    value="{{ request.form.get('signal_max', '20') }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="signal_unit">
+                    Signal Unit
+                </label>
+
+                <input
+                    type="text"
+                    id="signal_unit"
+                    name="signal_unit"
+                    value="{{ request.form.get('signal_unit', 'mA') }}"
+                    placeholder="mA, V, counts..."
+                >
+
+            </div>
+
+
+            <!-- Engineering -->
+
+            <h2>Engineering</h2>
+
+            <div>
+
+                <label for="engineering_min">
+                    Engineering Minimum
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="engineering_min"
+                    name="engineering_min"
+                    value="{{ request.form.get('engineering_min', '0') }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="engineering_max">
+                    Engineering Maximum
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="engineering_max"
+                    name="engineering_max"
+                    value="{{ request.form.get('engineering_max', '100') }}"
+                    required
+                >
+
+            </div>
+
+
+            <div>
+
+                <label for="engineering_unit">
+                    Engineering Unit
+                </label>
+
+                <input
+                    type="text"
+                    id="engineering_unit"
+                    name="engineering_unit"
+                    value="{{ request.form.get('engineering_unit', '%') }}"
+                    placeholder="PSI, °C, RPM, %..."
+                >
+
+            </div>
+
+
+            <button type="submit">
+                Scale Value
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- Error -->
+
+{% if error %}
+
+<div class="error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<!-- Results -->
+
+{% if result %}
+
+<section class="result">
+
+    <h2>Scaling Results</h2>
+
+    <div class="result-tables">
+
+
+        {% if direction == "signal_to_engineering" %}
+
+        <!-- Forward: Signal → Engineering -->
+
+        <div>
+
+            <h3>Signal</h3>
+
+            <table>
+
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                </tr>
+
+                <tr>
+                    <td>Signal Value</td>
+                    <td>
+                        {{ "%.6g"|format(result.input_value) }}
+                        {{ signal_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Signal Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.input_min) }}
+                        –
+                        {{ "%.6g"|format(result.input_max) }}
+                        {{ signal_unit }}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div>
+
+            <h3>Engineering</h3>
+
+            <table>
+
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                </tr>
+
+                <tr>
+                    <td>Engineering Value</td>
+                    <td>
+                        {{ "%.6g"|format(result.output_value) }}
+                        {{ engineering_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Engineering Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.output_min) }}
+                        –
+                        {{ "%.6g"|format(result.output_max) }}
+                        {{ engineering_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Position in Range</td>
+                    <td>
+                        {{ "%.4g"|format(result.percentage) }} %
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        {% elif direction == "engineering_to_signal" %}
+
+        <!-- Reverse: Engineering → Signal -->
+
+        <div>
+
+            <h3>Engineering</h3>
+
+            <table>
+
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                </tr>
+
+                <tr>
+                    <td>Engineering Value</td>
+                    <td>
+                        {{ "%.6g"|format(result.input_value) }}
+                        {{ engineering_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Engineering Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.input_min) }}
+                        –
+                        {{ "%.6g"|format(result.input_max) }}
+                        {{ engineering_unit }}
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+
+        <div>
+
+            <h3>Signal</h3>
+
+            <table>
+
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                </tr>
+
+                <tr>
+                    <td>Signal Value</td>
+                    <td>
+                        {{ "%.6g"|format(result.output_value) }}
+                        {{ signal_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Signal Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.output_min) }}
+                        –
+                        {{ "%.6g"|format(result.output_max) }}
+                        {{ signal_unit }}
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Position in Range</td>
+                    <td>
+                        {{ "%.4g"|format(result.percentage) }} %
+                    </td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+<script src="{{ url_for('static', filename='js/analog_scaling.js') }}"></script>
+
+{% endblock %}

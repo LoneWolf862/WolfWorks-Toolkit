@@ -196,3 +196,46 @@ def calculate_dac(digital_count, min_voltage, max_voltage, bits):
         "lsb": lsb,
         "output_voltage": output_voltage,
     }
+    
+#----# Analog Scaling #----#    
+def calculate_linear_scaling(
+    input_value,
+    input_min,
+    input_max,
+    output_min,
+    output_max,
+):
+    if input_max == input_min:
+        raise ValueError(
+            "Input maximum and minimum cannot be equal."
+        )
+
+    if input_value < min(input_min, input_max) or \
+       input_value > max(input_min, input_max):
+        raise ValueError(
+            "Input value must be within the configured input range."
+        )
+
+    input_span = input_max - input_min
+    output_span = output_max - output_min
+
+    normalized_value = (
+        (input_value - input_min) / input_span
+    )
+
+    output_value = (
+        output_min
+        + normalized_value * output_span
+    )
+
+    percentage = normalized_value * 100
+
+    return {
+        "input_value": input_value,
+        "input_min": input_min,
+        "input_max": input_max,
+        "output_min": output_min,
+        "output_max": output_max,
+        "output_value": output_value,
+        "percentage": percentage,
+    }

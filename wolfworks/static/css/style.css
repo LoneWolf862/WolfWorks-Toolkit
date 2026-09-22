@@ -233,3 +233,14 @@ small {
         max-width: 500px;
     }
 }
+
+
+
+select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem;
+    font: inherit;
+    background-color: white;
+    border: 1px solid #bbb;
+}
