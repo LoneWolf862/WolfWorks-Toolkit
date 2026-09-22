@@ -94,30 +94,26 @@
             <h3>Input Values</h3>
 
             <table>
-                <tr>
-                    <th>Quantity</th>
-                    <th>Value</th>
-                    <th>Unit</th>
-                </tr>
+				<tr>
+					<th>Quantity</th>
+					<th>Value</th>
+				</tr>
 
-                <tr>
-                    <td>Input Voltage</td>
-                    <td>{{ "%.6g"|format(result.input_voltage) }}</td>
-                    <td>V</td>
-                </tr>
+				<tr>
+					<td>Input Voltage</td>
+					<td>{{ result.input_voltage|engineering("V") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R1</td>
-                    <td>{{ "%.6g"|format(result.resistor_1) }}</td>
-                    <td>Ω</td>
-                </tr>
+				<tr>
+					<td>R1</td>
+					<td>{{ result.resistor_1|engineering("Ω") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R2</td>
-                    <td>{{ "%.6g"|format(result.resistor_2) }}</td>
-                    <td>Ω</td>
-                </tr>
-            </table>
+				<tr>
+					<td>R2</td>
+					<td>{{ result.resistor_2|engineering("Ω") }}</td>
+				</tr>
+			</table>
         </div>
 
 
@@ -125,54 +121,46 @@
             <h3>Results</h3>
 
             <table>
-                <tr>
-                    <th>Quantity</th>
-                    <th>Value</th>
-                    <th>Unit</th>
-                </tr>
+				<tr>
+					<th>Quantity</th>
+					<th>Value</th>
+				</tr>
 
-                <tr>
-                    <td>Output Voltage</td>
-                    <td>{{ "%.6g"|format(result.output_voltage) }}</td>
-                    <td>V</td>
-                </tr>
+				<tr>
+					<td>Output Voltage</td>
+					<td>{{ result.output_voltage|engineering("V") }}</td>
+				</tr>
 
-                <tr>
-                    <td>Circuit Current</td>
-                    <td>{{ "%.6g"|format(result.current) }}</td>
-                    <td>A</td>
-                </tr>
+				<tr>
+					<td>Circuit Current</td>
+					<td>{{ result.current|engineering("A") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R1 Voltage Drop</td>
-                    <td>{{ "%.6g"|format(result.voltage_r1) }}</td>
-                    <td>V</td>
-                </tr>
+				<tr>
+					<td>R1 Voltage Drop</td>
+					<td>{{ result.voltage_r1|engineering("V") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R2 Voltage Drop</td>
-                    <td>{{ "%.6g"|format(result.voltage_r2) }}</td>
-                    <td>V</td>
-                </tr>
+				<tr>
+					<td>R2 Voltage Drop</td>
+					<td>{{ result.voltage_r2|engineering("V") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R1 Power</td>
-                    <td>{{ "%.6g"|format(result.power_r1) }}</td>
-                    <td>W</td>
-                </tr>
+				<tr>
+					<td>R1 Power</td>
+					<td>{{ result.power_r1|engineering("W") }}</td>
+				</tr>
 
-                <tr>
-                    <td>R2 Power</td>
-                    <td>{{ "%.6g"|format(result.power_r2) }}</td>
-                    <td>W</td>
-                </tr>
+				<tr>
+					<td>R2 Power</td>
+					<td>{{ result.power_r2|engineering("W") }}</td>
+				</tr>
 
-                <tr>
-                    <td>Total Resistance</td>
-                    <td>{{ "%.6g"|format(result.total_resistance) }}</td>
-                    <td>Ω</td>
-                </tr>
-            </table>
+				<tr>
+					<td>Total Resistance</td>
+					<td>{{ result.total_resistance|engineering("Ω") }}</td>
+				</tr>
+			</table>
         </div>
 
     </div>

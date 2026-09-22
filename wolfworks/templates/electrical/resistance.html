@@ -83,46 +83,39 @@
             <h3>Input Values</h3>
 
             <table>
-                <tr>
-                    <th>Resistor</th>
-                    <th>Value</th>
-                    <th>Unit</th>
-                </tr>
+				<tr>
+					<th>Resistor</th>
+					<th>Value</th>
+				</tr>
 
-                {% for resistor in result.resistors %}
-                <tr>
-                    <td>R{{ loop.index }}</td>
-                    <td>{{ "%.6g"|format(resistor) }}</td>
-                    <td>Ω</td>
-                </tr>
-                {% endfor %}
-            </table>
+				{% for resistor in result.resistors %}
+				<tr>
+					<td>R{{ loop.index }}</td>
+					<td>{{ resistor|engineering("Ω") }}</td>
+				</tr>
+				{% endfor %}
+			</table>
         </div>
 
         <div>
             <h3>Result</h3>
 
             <table>
-                <tr>
-                    <th>Quantity</th>
-                    <th>Value</th>
-                    <th>Unit</th>
-                </tr>
+				<tr>
+					<th>Quantity</th>
+					<th>Value</th>
+				</tr>
 
-                <tr>
-                    <td>Configuration</td>
-                    <td>{{ result.configuration|capitalize }}</td>
-                    <td>—</td>
-                </tr>
+				<tr>
+					<td>Configuration</td>
+					<td>{{ result.configuration|capitalize }}</td>
+				</tr>
 
-                <tr>
-                    <td>Equivalent Resistance</td>
-                    <td>
-                        {{ "%.6g"|format(result.equivalent_resistance) }}
-                    </td>
-                    <td>Ω</td>
-                </tr>
-            </table>
+				<tr>
+					<td>Equivalent Resistance</td>
+					<td>{{ result.equivalent_resistance|engineering("Ω") }}</td>
+				</tr>
+			</table>
         </div>
 
     </div>

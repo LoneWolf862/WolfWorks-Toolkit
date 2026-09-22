@@ -195,3 +195,41 @@ small {
     width: auto;
     margin: 0;
 }
+
+
+
+
+.converter-layout {
+    display: grid;
+    grid-template-columns: 500px 500px;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+.converter-panel {
+    width: 100%;
+}
+
+.converter-panel h2 {
+    margin-top: 0;
+}
+
+.converter-panel form {
+    width: 100%;
+}
+
+.converter-error {
+    margin-top: 2rem;
+}
+
+@media (max-width: 1150px) {
+    .converter-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .converter-panel {
+        max-width: 500px;
+    }
+}

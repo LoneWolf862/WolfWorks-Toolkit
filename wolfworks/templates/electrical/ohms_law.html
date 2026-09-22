@@ -75,37 +75,31 @@
     <h2>Results</h2>
 
     <table>
-        <tr>
-            <th>Quantity</th>
-            <th>Value</th>
-            <th>Unit</th>
-        </tr>
+		<tr>
+			<th>Quantity</th>
+			<th>Value</th>
+		</tr>
 
-        <tr>
-            <td>Voltage</td>
-            <td>{{ "%.4g"|format(result.voltage) }}</td>
-            <td>V</td>
-        </tr>
+		<tr>
+			<td>Voltage</td>
+			<td>{{ result.voltage|engineering("V") }}</td>
+		</tr>
 
-        <tr>
-            <td>Current</td>
-            <td>{{ "%.4g"|format(result.current) }}</td>
-            <td>A</td>
-        </tr>
+		<tr>
+			<td>Current</td>
+			<td>{{ result.current|engineering("A") }}</td>
+		</tr>
 
-        <tr>
-            <td>Resistance</td>
-            <td>{{ "%.4g"|format(result.resistance) }}</td>
-            <td>Ω</td>
-        </tr>
+		<tr>
+			<td>Resistance</td>
+			<td>{{ result.resistance|engineering("Ω") }}</td>
+		</tr>
 
-        <tr>
-            <td>Power</td>
-            <td>{{ "%.4g"|format(result.power) }}</td>
-            <td>W</td>
-        </tr>
-
-    </table>
+		<tr>
+			<td>Power</td>
+			<td>{{ result.power|engineering("W") }}</td>
+		</tr>
+	</table>
 
 </section>
 

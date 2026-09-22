@@ -1,6 +1,7 @@
 from flask import Flask
 
 from wolfworks.extensions import db
+from wolfworks.electrical.formatting import format_engineering
 
 
 def create_app():
@@ -10,6 +11,8 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+
+    app.jinja_env.filters["engineering"] = format_engineering
 
     from wolfworks.core import core_bp
     app.register_blueprint(core_bp)

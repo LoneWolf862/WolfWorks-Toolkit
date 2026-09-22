@@ -5,6 +5,8 @@ from wolfworks.electrical.calculations import (
     calculate_ohms_law,
     calculate_voltage_divider,
     calculate_resistance,
+    calculate_adc,
+    calculate_dac,
 )
 
 
@@ -100,4 +102,76 @@ def resistance():
         "electrical/resistance.html",
         result=result,
         error=error,
+    )
+    
+
+@electrical_bp.route("/adc-dac/", methods=["GET", "POST"])
+def adc_dac():
+    result = None
+    error = None
+    calculation_type = None
+
+    if request.method == "POST":
+        try:
+            calculation_type = request.form.get("calculation_type")
+
+            if calculation_type == "adc":
+                input_voltage = float(
+                    request.form["adc_input_voltage"]
+                )
+
+                min_voltage = float(
+                    request.form["adc_min_voltage"]
+                )
+
+                max_voltage = float(
+                    request.form["adc_max_voltage"]
+                )
+
+                bits = int(
+                    request.form["adc_bits"]
+                )
+
+                result = calculate_adc(
+                    input_voltage,
+                    min_voltage,
+                    max_voltage,
+                    bits,
+                )
+
+            elif calculation_type == "dac":
+                digital_count = int(
+                    request.form["dac_digital_count"]
+                )
+
+                min_voltage = float(
+                    request.form["dac_min_voltage"]
+                )
+
+                max_voltage = float(
+                    request.form["dac_max_voltage"]
+                )
+
+                bits = int(
+                    request.form["dac_bits"]
+                )
+
+                result = calculate_dac(
+                    digital_count,
+                    min_voltage,
+                    max_voltage,
+                    bits,
+                )
+
+            else:
+                raise ValueError("Invalid calculation type.")
+
+        except ValueError as exc:
+            error = str(exc)
+
+    return render_template(
+        "electrical/adc_dac.html",
+        result=result,
+        error=error,
+        calculation_type=calculation_type,
     )

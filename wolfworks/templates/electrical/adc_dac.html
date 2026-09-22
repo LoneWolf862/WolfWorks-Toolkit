@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}ADC / DAC Calculator | WolfWorks Engineering Toolkit{% endblock %}
+
+{% block content %}
+
+<h1>ADC / DAC Converter Calculator</h1>
+
+<p>
+    Calculate digital ADC values or analog DAC output voltages
+    for configurable voltage ranges and converter resolutions.
+</p>
+
+
+<div class="converter-layout">
+
+    <!-- ADC -->
+
+    <div class="converter-panel">
+
+        <h2>ADC</h2>
+
+        <p>
+            Convert an analog voltage into a digital value.
+        </p>
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="calculation_type"
+                value="adc"
+            >
+
+            <div>
+                <label for="adc_input_voltage">
+                    Analog Input Voltage (V)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="adc_input_voltage"
+                    name="adc_input_voltage"
+                    value="{{ request.form.get('adc_input_voltage', '') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="adc_min_voltage">
+                    Minimum Voltage (V)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="adc_min_voltage"
+                    name="adc_min_voltage"
+                    value="{{ request.form.get('adc_min_voltage', '0') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="adc_max_voltage">
+                    Maximum Voltage (V)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="adc_max_voltage"
+                    name="adc_max_voltage"
+                    value="{{ request.form.get('adc_max_voltage', '5') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="adc_bits">
+                    Resolution (bits)
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    id="adc_bits"
+                    name="adc_bits"
+                    value="{{ request.form.get('adc_bits', '12') }}"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                Calculate ADC
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- DAC -->
+
+    <div class="converter-panel">
+
+        <h2>DAC</h2>
+
+        <p>
+            Convert a digital value into an analog voltage.
+        </p>
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="calculation_type"
+                value="dac"
+            >
+
+            <div>
+                <label for="dac_digital_count">
+                    Digital Count
+                </label>
+
+                <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    id="dac_digital_count"
+                    name="dac_digital_count"
+                    value="{{ request.form.get('dac_digital_count', '') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="dac_min_voltage">
+                    Minimum Voltage (V)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="dac_min_voltage"
+                    name="dac_min_voltage"
+                    value="{{ request.form.get('dac_min_voltage', '0') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="dac_max_voltage">
+                    Maximum Voltage (V)
+                </label>
+
+                <input
+                    type="number"
+                    step="any"
+                    id="dac_max_voltage"
+                    name="dac_max_voltage"
+                    value="{{ request.form.get('dac_max_voltage', '5') }}"
+                    required
+                >
+            </div>
+
+            <div>
+                <label for="dac_bits">
+                    Resolution (bits)
+                </label>
+
+                <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    id="dac_bits"
+                    name="dac_bits"
+                    value="{{ request.form.get('dac_bits', '12') }}"
+                    required
+                >
+            </div>
+
+            <button type="submit">
+                Calculate DAC
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+{% if error %}
+
+<div class="error converter-error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+{% if result and calculation_type == "adc" %}
+
+<section class="result">
+
+    <h2>ADC Results</h2>
+
+    <div class="result-tables">
+
+        <div>
+            <h3>Configuration</h3>
+
+            <table>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                </tr>
+
+                <tr>
+                    <td>Input Voltage</td>
+                    <td>{{ "%.8g"|format(result.input_voltage) }}</td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>Voltage Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.min_voltage) }}
+                        to
+                        {{ "%.6g"|format(result.max_voltage) }}
+                    </td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>Resolution</td>
+                    <td>{{ result.bits }}</td>
+                    <td>bits</td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div>
+			<h3>Results</h3>
+
+			<table>
+				<tr>
+					<th>Quantity</th>
+					<th>Value</th>
+				</tr>
+
+				<tr>
+					<td>Digital Count</td>
+					<td>{{ result.digital_count }}</td>
+				</tr>
+
+				<tr>
+					<td>Maximum Count</td>
+					<td>{{ result.max_count }}</td>
+				</tr>
+
+				<tr>
+					<td>LSB</td>
+					<td>{{ result.lsb|engineering("V") }}</td>
+				</tr>
+
+				<tr>
+					<td>Quantized Voltage</td>
+					<td>{{ result.quantized_voltage|engineering("V") }}</td>
+				</tr>
+
+				<tr>
+					<td>Quantization Error</td>
+					<td>{{ result.quantization_error|engineering("V") }}</td>
+				</tr>
+			</table>
+		</div>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+
+{% if result and calculation_type == "dac" %}
+
+<section class="result">
+
+    <h2>DAC Results</h2>
+
+    <div class="result-tables">
+
+        <div>
+            <h3>Configuration</h3>
+
+            <table>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                </tr>
+
+                <tr>
+                    <td>Digital Count</td>
+                    <td>{{ result.digital_count }}</td>
+                    <td>counts</td>
+                </tr>
+
+                <tr>
+                    <td>Voltage Range</td>
+                    <td>
+                        {{ "%.6g"|format(result.min_voltage) }}
+                        to
+                        {{ "%.6g"|format(result.max_voltage) }}
+                    </td>
+                    <td>V</td>
+                </tr>
+
+                <tr>
+                    <td>Resolution</td>
+                    <td>{{ result.bits }}</td>
+                    <td>bits</td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div>
+			<h3>Results</h3>
+
+			<table>
+				<tr>
+					<th>Quantity</th>
+					<th>Value</th>
+				</tr>
+
+				<tr>
+					<td>Output Voltage</td>
+					<td>{{ result.output_voltage|engineering("V") }}</td>
+				</tr>
+
+				<tr>
+					<td>Maximum Count</td>
+					<td>{{ result.max_count }}</td>
+				</tr>
+
+				<tr>
+					<td>LSB</td>
+					<td>{{ result.lsb|engineering("V") }}</td>
+				</tr>
+			</table>
+		</div>
+
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

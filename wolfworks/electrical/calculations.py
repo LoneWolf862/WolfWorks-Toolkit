@@ -112,3 +112,87 @@ def calculate_resistance(resistors, configuration):
         "configuration": configuration,
         "equivalent_resistance": equivalent_resistance,
     }
+    
+#----# ADC calculation #----#    
+def calculate_adc(input_voltage, min_voltage, max_voltage, bits):
+    if bits <= 0:
+        raise ValueError("Resolution must be greater than zero bits.")
+
+    if not isinstance(bits, int):
+        raise ValueError("Resolution must be a whole number of bits.")
+
+    if max_voltage <= min_voltage:
+        raise ValueError(
+            "Maximum voltage must be greater than minimum voltage."
+        )
+
+    if input_voltage < min_voltage or input_voltage > max_voltage:
+        raise ValueError(
+            "Input voltage must be within the configured voltage range."
+        )
+
+    max_count = (2 ** bits) - 1
+    voltage_range = max_voltage - min_voltage
+    lsb = voltage_range / max_count
+
+    normalized_voltage = input_voltage - min_voltage
+    ideal_count = normalized_voltage / voltage_range * max_count
+
+    digital_count = round(ideal_count)
+
+    quantized_voltage = (
+        min_voltage
+        + (digital_count / max_count) * voltage_range
+    )
+
+    quantization_error = quantized_voltage - input_voltage
+
+    return {
+        "input_voltage": input_voltage,
+        "min_voltage": min_voltage,
+        "max_voltage": max_voltage,
+        "bits": bits,
+        "max_count": max_count,
+        "digital_count": digital_count,
+        "lsb": lsb,
+        "quantized_voltage": quantized_voltage,
+        "quantization_error": quantization_error,
+    }
+
+#----# DAC calculation #----#
+def calculate_dac(digital_count, min_voltage, max_voltage, bits):
+    if bits <= 0:
+        raise ValueError("Resolution must be greater than zero bits.")
+
+    if not isinstance(bits, int):
+        raise ValueError("Resolution must be a whole number of bits.")
+
+    if max_voltage <= min_voltage:
+        raise ValueError(
+            "Maximum voltage must be greater than minimum voltage."
+        )
+
+    max_count = (2 ** bits) - 1
+
+    if digital_count < 0 or digital_count > max_count:
+        raise ValueError(
+            f"Digital count must be between 0 and {max_count}."
+        )
+
+    voltage_range = max_voltage - min_voltage
+    lsb = voltage_range / max_count
+
+    output_voltage = (
+        min_voltage
+        + (digital_count / max_count) * voltage_range
+    )
+
+    return {
+        "digital_count": digital_count,
+        "min_voltage": min_voltage,
+        "max_voltage": max_voltage,
+        "bits": bits,
+        "max_count": max_count,
+        "lsb": lsb,
+        "output_voltage": output_voltage,
+    }
