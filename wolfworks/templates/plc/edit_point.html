@@ -83,6 +83,143 @@ Edit I/O Point | WolfWorks Engineering Toolkit
         >
     </div>
 
+
+    <div id="analog-fields">
+
+        <h2>Signal</h2>
+
+        <div>
+            <label for="signal_preset">
+                Common Signal Range
+            </label>
+
+            <select id="signal_preset">
+                <option value="custom">Custom</option>
+                <option value="4-20ma">4–20 mA</option>
+                <option value="0-20ma">0–20 mA</option>
+                <option value="0-10v">0–10 V</option>
+                <option value="0-5v">0–5 V</option>
+                <option value="1-5v">1–5 V</option>
+                <option value="-10-10v">±10 V</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="signal_min">
+                Signal Minimum
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="signal_min"
+                name="signal_min"
+                value="{{ request.form.get(
+                    'signal_min',
+                    point.signal_min
+                    if point.signal_min is not none
+                    else ''
+                ) }}"
+            >
+        </div>
+
+        <div>
+            <label for="signal_max">
+                Signal Maximum
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="signal_max"
+                name="signal_max"
+                value="{{ request.form.get(
+                    'signal_max',
+                    point.signal_max
+                    if point.signal_max is not none
+                    else ''
+                ) }}"
+            >
+        </div>
+
+        <div>
+            <label for="signal_unit">
+                Signal Unit
+            </label>
+
+            <input
+                type="text"
+                id="signal_unit"
+                name="signal_unit"
+                value="{{ request.form.get(
+                    'signal_unit',
+                    point.signal_unit or ''
+                ) }}"
+                placeholder="mA, V, counts..."
+            >
+        </div>
+
+
+        <h2>Engineering</h2>
+
+        <div>
+            <label for="engineering_min">
+                Engineering Minimum
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="engineering_min"
+                name="engineering_min"
+                value="{{ request.form.get(
+                    'engineering_min',
+                    point.engineering_min
+                    if point.engineering_min is not none
+                    else ''
+                ) }}"
+            >
+        </div>
+
+        <div>
+            <label for="engineering_max">
+                Engineering Maximum
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="engineering_max"
+                name="engineering_max"
+                value="{{ request.form.get(
+                    'engineering_max',
+                    point.engineering_max
+                    if point.engineering_max is not none
+                    else ''
+                ) }}"
+            >
+        </div>
+
+        <div>
+            <label for="engineering_unit">
+                Engineering Unit
+            </label>
+
+            <input
+                type="text"
+                id="engineering_unit"
+                name="engineering_unit"
+                value="{{ request.form.get(
+                    'engineering_unit',
+                    point.engineering_unit or ''
+                ) }}"
+                placeholder="PSI, °C, RPM, %..."
+            >
+        </div>
+
+    </div>
+
+
     <button type="submit">
         Save Changes
     </button>
@@ -102,5 +239,11 @@ Edit I/O Point | WolfWorks Engineering Toolkit
 </div>
 
 {% endif %}
+
+
+<script src="{{ url_for(
+    'static',
+    filename='js/plc_io.js'
+) }}"></script>
 
 {% endblock %}

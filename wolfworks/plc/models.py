@@ -41,6 +41,11 @@ class IOPoint(db.Model):
         nullable=True,
     )
 
+    signal_unit = db.Column(
+        db.String(20),
+        nullable=True,
+    )
+
     engineering_min = db.Column(
         db.Float,
         nullable=True,

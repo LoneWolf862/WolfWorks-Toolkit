@@ -15,6 +15,9 @@ def app(tmp_path):
         ),
     })
 
+    with app.app_context():
+        db.create_all()
+
     yield app
 
     with app.app_context():

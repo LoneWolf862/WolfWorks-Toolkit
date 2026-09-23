@@ -84,6 +84,96 @@ PLC I/O Configurator | WolfWorks Engineering Toolkit
         >
     </div>
 
+	<div id="analog-fields">
+
+		<h3>Signal</h3>
+
+		<div>
+			<label for="signal_preset">Common Signal Range</label>
+
+			<select id="signal_preset">
+				<option value="custom">Custom</option>
+				<option value="4-20ma">4–20 mA</option>
+				<option value="0-20ma">0–20 mA</option>
+				<option value="0-10v">0–10 V</option>
+				<option value="0-5v">0–5 V</option>
+				<option value="1-5v">1–5 V</option>
+				<option value="-10-10v">±10 V</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="signal_min">Signal Minimum</label>
+			<input
+				type="number"
+				step="any"
+				id="signal_min"
+				name="signal_min"
+				value="{{ request.form.get('signal_min', '4') }}"
+			>
+		</div>
+
+		<div>
+			<label for="signal_max">Signal Maximum</label>
+			<input
+				type="number"
+				step="any"
+				id="signal_max"
+				name="signal_max"
+				value="{{ request.form.get('signal_max', '20') }}"
+			>
+		</div>
+
+		<div>
+			<label for="signal_unit">Signal Unit</label>
+			<input
+				type="text"
+				id="signal_unit"
+				name="signal_unit"
+				value="{{ request.form.get('signal_unit', 'mA') }}"
+				placeholder="mA, V, counts..."
+			>
+		</div>
+
+
+		<h3>Engineering</h3>
+
+		<div>
+			<label for="engineering_min">Engineering Minimum</label>
+			<input
+				type="number"
+				step="any"
+				id="engineering_min"
+				name="engineering_min"
+				value="{{ request.form.get('engineering_min', '0') }}"
+			>
+		</div>
+
+		<div>
+			<label for="engineering_max">Engineering Maximum</label>
+			<input
+				type="number"
+				step="any"
+				id="engineering_max"
+				name="engineering_max"
+				value="{{ request.form.get('engineering_max', '100') }}"
+			>
+		</div>
+
+		<div>
+			<label for="engineering_unit">Engineering Unit</label>
+			<input
+				type="text"
+				id="engineering_unit"
+				name="engineering_unit"
+				value="{{ request.form.get('engineering_unit', '%') }}"
+				placeholder="PSI, °C, RPM, %..."
+			>
+		</div>
+
+	</div>
+
+
     <button type="submit">
         Add I/O Point
     </button>
@@ -111,6 +201,7 @@ PLC I/O Configurator | WolfWorks Engineering Toolkit
 			<th>Type</th>
 			<th>Address</th>
 			<th>Description</th>
+			<th>Range</th>
 			<th>Actions</th>
 		</tr>
     </thead>
@@ -127,6 +218,24 @@ PLC I/O Configurator | WolfWorks Engineering Toolkit
 			<td>{{ point.address }}</td>
 
 			<td>{{ point.description or "—" }}</td>
+
+			<td>
+				{% if point.io_type in ["AI", "AO"] %}
+					{{ "%.6g"|format(point.signal_min) }}
+					–
+					{{ "%.6g"|format(point.signal_max) }}
+					{{ point.signal_unit }}
+
+					→
+
+					{{ "%.6g"|format(point.engineering_min) }}
+					–
+					{{ "%.6g"|format(point.engineering_max) }}
+					{{ point.engineering_unit }}
+				{% else %}
+					—
+				{% endif %}
+			</td>
 
 			<td class="io-actions">
 
@@ -168,5 +277,10 @@ PLC I/O Configurator | WolfWorks Engineering Toolkit
 <p>No I/O points have been configured yet.</p>
 
 {% endif %}
+
+<script src="{{ url_for(
+    'static',
+    filename='js/plc_io.js'
+) }}"></script>
 
 {% endblock %}

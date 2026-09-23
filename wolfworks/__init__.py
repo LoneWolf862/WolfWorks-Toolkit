@@ -1,6 +1,6 @@
 from flask import Flask
 
-from wolfworks.extensions import db
+from wolfworks.extensions import db, migrate
 from wolfworks.electrical.formatting import format_engineering
 
 
@@ -16,6 +16,7 @@ def create_app(test_config=None):
         app.config.update(test_config)
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
     # Jinja filters
     app.jinja_env.filters["engineering"] = format_engineering
@@ -29,9 +30,5 @@ def create_app(test_config=None):
 
     from wolfworks.plc import plc_bp
     app.register_blueprint(plc_bp)
-
-    # Create database tables after models have been imported
-    with app.app_context():
-        db.create_all()
 
     return app

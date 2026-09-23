@@ -40,14 +40,26 @@ def test_create_io_point(client, app):
     ["DI", "DO", "AI", "AO"],
 )
 def test_valid_io_types(client, app, io_type):
+    data = {
+        "tag_name": f"Test_{io_type}",
+        "io_type": io_type,
+        "address": f"Test:{io_type}",
+        "description": "",
+    }
+
+    if io_type in {"AI", "AO"}:
+        data.update({
+            "signal_min": "4",
+            "signal_max": "20",
+            "signal_unit": "mA",
+            "engineering_min": "0",
+            "engineering_max": "100",
+            "engineering_unit": "%",
+        })
+
     client.post(
         "/plc/",
-        data={
-            "tag_name": f"Test_{io_type}",
-            "io_type": io_type,
-            "address": f"Test:{io_type}",
-            "description": "",
-        },
+        data=data,
     )
 
     with app.app_context():
@@ -57,6 +69,21 @@ def test_valid_io_types(client, app, io_type):
 
         assert point is not None
         assert point.io_type == io_type
+
+        if io_type in {"AI", "AO"}:
+            assert point.signal_min == 4
+            assert point.signal_max == 20
+            assert point.signal_unit == "mA"
+            assert point.engineering_min == 0
+            assert point.engineering_max == 100
+            assert point.engineering_unit == "%"
+        else:
+            assert point.signal_min is None
+            assert point.signal_max is None
+            assert point.signal_unit is None
+            assert point.engineering_min is None
+            assert point.engineering_max is None
+            assert point.engineering_unit is None
 
 
 def test_duplicate_tag_rejected(client, app):
@@ -227,5 +254,186 @@ def test_delete_io_point(client, app):
 
     with app.app_context():
         point = db.session.get(IOPoint, point_id)
+
+        assert point is None
+        
+
+
+
+def test_create_analog_io_point(client, app):
+    client.post(
+        "/plc/",
+        data={
+            "tag_name": "Pressure_01",
+            "io_type": "AI",
+            "address": "Local:3:I.Ch00Data",
+            "description": "Tank pressure",
+            "signal_min": "4",
+            "signal_max": "20",
+            "signal_unit": "mA",
+            "engineering_min": "0",
+            "engineering_max": "300",
+            "engineering_unit": "PSI",
+        },
+    )
+
+    with app.app_context():
+        point = IOPoint.query.filter_by(
+            tag_name="Pressure_01"
+        ).first()
+
+        assert point is not None
+        assert point.io_type == "AI"
+
+        assert point.signal_min == 4
+        assert point.signal_max == 20
+        assert point.signal_unit == "mA"
+
+        assert point.engineering_min == 0
+        assert point.engineering_max == 300
+        assert point.engineering_unit == "PSI"
+
+
+def test_edit_analog_io_point(client, app):
+    with app.app_context():
+        point = IOPoint(
+            tag_name="Pressure_01",
+            io_type="AI",
+            address="Local:3:I.Ch00Data",
+            description="Tank pressure",
+            signal_min=4,
+            signal_max=20,
+            signal_unit="mA",
+            engineering_min=0,
+            engineering_max=300,
+            engineering_unit="PSI",
+        )
+
+        db.session.add(point)
+        db.session.commit()
+
+        point_id = point.id
+
+    client.post(
+        f"/plc/point/{point_id}/edit/",
+        data={
+            "tag_name": "Pressure_01",
+            "io_type": "AI",
+            "address": "Local:3:I.Ch00Data",
+            "description": "Tank pressure",
+            "signal_min": "4",
+            "signal_max": "20",
+            "signal_unit": "mA",
+            "engineering_min": "0",
+            "engineering_max": "500",
+            "engineering_unit": "PSI",
+        },
+    )
+
+    with app.app_context():
+        point = db.session.get(
+            IOPoint,
+            point_id,
+        )
+
+        assert point.engineering_max == 500
+        assert point.signal_min == 4
+        assert point.signal_max == 20
+        assert point.signal_unit == "mA"
+
+
+def test_analog_to_digital_clears_ranges(client, app):
+    with app.app_context():
+        point = IOPoint(
+            tag_name="Pressure_01",
+            io_type="AI",
+            address="Local:3:I.Ch00Data",
+            description="Tank pressure",
+            signal_min=4,
+            signal_max=20,
+            signal_unit="mA",
+            engineering_min=0,
+            engineering_max=300,
+            engineering_unit="PSI",
+        )
+
+        db.session.add(point)
+        db.session.commit()
+
+        point_id = point.id
+
+    client.post(
+        f"/plc/point/{point_id}/edit/",
+        data={
+            "tag_name": "Pressure_01",
+            "io_type": "DI",
+            "address": "Local:3:I.Data.0",
+            "description": "Digital pressure switch",
+        },
+    )
+
+    with app.app_context():
+        point = db.session.get(
+            IOPoint,
+            point_id,
+        )
+
+        assert point.io_type == "DI"
+
+        assert point.signal_min is None
+        assert point.signal_max is None
+        assert point.signal_unit is None
+
+        assert point.engineering_min is None
+        assert point.engineering_max is None
+        assert point.engineering_unit is None
+
+
+def test_equal_signal_limits_rejected(client, app):
+    client.post(
+        "/plc/",
+        data={
+            "tag_name": "Bad_AI",
+            "io_type": "AI",
+            "address": "Local:3:I.Ch01Data",
+            "description": "",
+            "signal_min": "4",
+            "signal_max": "4",
+            "signal_unit": "mA",
+            "engineering_min": "0",
+            "engineering_max": "100",
+            "engineering_unit": "%",
+        },
+    )
+
+    with app.app_context():
+        point = IOPoint.query.filter_by(
+            tag_name="Bad_AI"
+        ).first()
+
+        assert point is None
+
+
+def test_equal_engineering_limits_rejected(client, app):
+    client.post(
+        "/plc/",
+        data={
+            "tag_name": "Bad_AI",
+            "io_type": "AI",
+            "address": "Local:3:I.Ch01Data",
+            "description": "",
+            "signal_min": "4",
+            "signal_max": "20",
+            "signal_unit": "mA",
+            "engineering_min": "100",
+            "engineering_max": "100",
+            "engineering_unit": "%",
+        },
+    )
+
+    with app.app_context():
+        point = IOPoint.query.filter_by(
+            tag_name="Bad_AI"
+        ).first()
 
         assert point is None
