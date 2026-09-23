@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit I/O Point | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Edit I/O Point</h1>
+
+<p>
+    Modify the configuration for {{ point.tag_name }}.
+</p>
+
+<form method="POST">
+
+    <div>
+        <label for="tag_name">Tag Name</label>
+        <input
+            type="text"
+            id="tag_name"
+            name="tag_name"
+            value="{{ request.form.get('tag_name', point.tag_name) }}"
+            required
+        >
+    </div>
+
+    <div>
+        <label for="io_type">I/O Type</label>
+
+        {% set selected_type =
+            request.form.get('io_type', point.io_type) %}
+
+        <select
+            id="io_type"
+            name="io_type"
+            required
+        >
+            <option value="DI"
+                {% if selected_type == "DI" %}selected{% endif %}>
+                Digital Input (DI)
+            </option>
+
+            <option value="DO"
+                {% if selected_type == "DO" %}selected{% endif %}>
+                Digital Output (DO)
+            </option>
+
+            <option value="AI"
+                {% if selected_type == "AI" %}selected{% endif %}>
+                Analog Input (AI)
+            </option>
+
+            <option value="AO"
+                {% if selected_type == "AO" %}selected{% endif %}>
+                Analog Output (AO)
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="address">Address</label>
+        <input
+            type="text"
+            id="address"
+            name="address"
+            value="{{ request.form.get('address', point.address) }}"
+            required
+        >
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <input
+            type="text"
+            id="description"
+            name="description"
+            value="{{ request.form.get(
+                'description',
+                point.description or ''
+            ) }}"
+        >
+    </div>
+
+    <button type="submit">
+        Save Changes
+    </button>
+
+    <a href="{{ url_for('plc.index') }}">
+        Cancel
+    </a>
+
+</form>
+
+
+{% if error %}
+
+<div class="error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+{% endblock %}

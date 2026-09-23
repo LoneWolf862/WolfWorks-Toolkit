@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}
+PLC I/O Configurator | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>PLC I/O Configurator</h1>
+
+<p>
+    Create and manage PLC input and output configurations.
+</p>
+
+<h2>Add I/O Point</h2>
+
+<form method="POST">
+
+    <div>
+        <label for="tag_name">Tag Name</label>
+        <input
+            type="text"
+            id="tag_name"
+            name="tag_name"
+            value="{{ request.form.get('tag_name', '') }}"
+            placeholder="Start_PB"
+            required
+        >
+    </div>
+
+    <div>
+        <label for="io_type">I/O Type</label>
+
+		{% set selected_type = request.form.get('io_type', 'DI') %}
+
+        <select
+            id="io_type"
+            name="io_type"
+            required
+        >
+            <option value="DI"
+				{% if selected_type == "DI" %}selected{% endif %}>
+				Digital Input (DI)
+			</option>
+
+			<option value="DO"
+				{% if selected_type == "DO" %}selected{% endif %}>
+				Digital Output (DO)
+			</option>
+
+			<option value="AI"
+				{% if selected_type == "AI" %}selected{% endif %}>
+				Analog Input (AI)
+			</option>
+
+			<option value="AO"
+				{% if selected_type == "AO" %}selected{% endif %}>
+				Analog Output (AO)
+			</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="address">Address</label>
+        <input
+            type="text"
+            id="address"
+            name="address"
+            value="{{ request.form.get('address', '') }}"
+            placeholder="Local:1:I.Data.0"
+            required
+        >
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <input
+            type="text"
+            id="description"
+            name="description"
+            value="{{ request.form.get('description', '') }}"
+            placeholder="Start pushbutton"
+        >
+    </div>
+
+    <button type="submit">
+        Add I/O Point
+    </button>
+
+</form>
+
+
+{% if error %}
+
+<div class="error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+<h2>Configured I/O Points</h2>
+
+{% if io_points %}
+
+<table>
+    <thead>
+        <tr>
+			<th>Tag Name</th>
+			<th>Type</th>
+			<th>Address</th>
+			<th>Description</th>
+			<th>Actions</th>
+		</tr>
+    </thead>
+
+    <tbody>
+
+		{% for point in io_points %}
+
+		<tr>
+			<td>{{ point.tag_name }}</td>
+
+			<td>{{ point.io_type }}</td>
+
+			<td>{{ point.address }}</td>
+
+			<td>{{ point.description or "—" }}</td>
+
+			<td class="io-actions">
+
+				<a href="{{ url_for(
+					'plc.edit_point',
+					point_id=point.id
+				) }}">
+					Edit
+				</a>
+
+				<form
+					method="POST"
+					action="{{ url_for(
+						'plc.delete_point',
+						point_id=point.id
+					) }}"
+					class="inline-form"
+				>
+					<button
+						type="submit"
+						onclick="return confirm(
+							'Delete {{ point.tag_name }}?'
+						);"
+					>
+						Delete
+					</button>
+				</form>
+
+			</td>
+		</tr>
+
+		{% endfor %}
+
+	</tbody>
+</table>
+
+{% else %}
+
+<p>No I/O points have been configured yet.</p>
+
+{% endif %}
+
+{% endblock %}
