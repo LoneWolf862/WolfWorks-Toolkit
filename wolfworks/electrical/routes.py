@@ -8,6 +8,15 @@ from wolfworks.electrical.calculations import (
     calculate_adc,
     calculate_dac,
     calculate_linear_scaling,
+    calculate_period,
+    calculate_frequency,
+    calculate_cycles_to_time,
+    calculate_time_to_cycles,
+    calculate_clock_divider,
+    calculate_timer,
+    calculate_pwm,
+    frequency_to_hz,
+    time_to_seconds,
 )
 
 
@@ -257,4 +266,330 @@ def analog_scaling():
         direction=direction,
         signal_unit=signal_unit,
         engineering_unit=engineering_unit,
+    )
+    
+@electrical_bp.route(
+    "/clock-timing/",
+    methods=["GET", "POST"],
+)
+def clock_timing():
+    result = None
+    error = None
+
+    if request.method == "POST":
+        try:
+            mode = request.form.get(
+                "mode",
+                "frequency_period",
+            )
+
+            # ------------------------------------------
+            # Frequency / Period
+            # ------------------------------------------
+
+            if mode == "frequency_period":
+                direction = request.form.get(
+                    "direction",
+                    "frequency_to_period",
+                )
+
+                if direction == "frequency_to_period":
+                    value = float(
+                        request.form.get("frequency", "")
+                    )
+
+                    unit = request.form.get(
+                        "frequency_unit",
+                        "Hz",
+                    )
+
+                    frequency = frequency_to_hz(
+                        value,
+                        unit,
+                    )
+
+                    result = {
+                        "mode": mode,
+                        "direction": direction,
+                        "input_value": value,
+                        "input_unit": unit,
+                        "frequency": frequency,
+                        "period": calculate_period(
+                            frequency
+                        ),
+                    }
+
+                elif direction == "period_to_frequency":
+                    value = float(
+                        request.form.get("period", "")
+                    )
+
+                    unit = request.form.get(
+                        "period_unit",
+                        "s",
+                    )
+
+                    period = time_to_seconds(
+                        value,
+                        unit,
+                    )
+
+                    result = {
+                        "mode": mode,
+                        "direction": direction,
+                        "input_value": value,
+                        "input_unit": unit,
+                        "period": period,
+                        "frequency": calculate_frequency(
+                            period
+                        ),
+                    }
+
+                else:
+                    raise ValueError(
+                        "Invalid conversion direction."
+                    )
+
+            # ------------------------------------------
+            # Clock Cycles / Time
+            # ------------------------------------------
+
+            elif mode == "cycles_time":
+                direction = request.form.get(
+                    "direction",
+                    "cycles_to_time",
+                )
+
+                clock_value = float(
+                    request.form.get(
+                        "clock_frequency",
+                        "",
+                    )
+                )
+
+                clock_unit = request.form.get(
+                    "clock_frequency_unit",
+                    "Hz",
+                )
+
+                clock_frequency = frequency_to_hz(
+                    clock_value,
+                    clock_unit,
+                )
+
+                if direction == "cycles_to_time":
+                    cycles = float(
+                        request.form.get("cycles", "")
+                    )
+
+                    result = {
+                        "mode": mode,
+                        "direction": direction,
+                        "clock_frequency": clock_frequency,
+                        "cycles": cycles,
+                        "time": calculate_cycles_to_time(
+                            clock_frequency,
+                            cycles,
+                        ),
+                    }
+
+                elif direction == "time_to_cycles":
+                    time_value = float(
+                        request.form.get("time", "")
+                    )
+
+                    time_unit = request.form.get(
+                        "time_unit",
+                        "s",
+                    )
+
+                    time = time_to_seconds(
+                        time_value,
+                        time_unit,
+                    )
+
+                    result = {
+                        "mode": mode,
+                        "direction": direction,
+                        "clock_frequency": clock_frequency,
+                        "time": time,
+                        "cycles": calculate_time_to_cycles(
+                            clock_frequency,
+                            time,
+                        ),
+                    }
+
+                else:
+                    raise ValueError(
+                        "Invalid conversion direction."
+                    )
+
+            # ------------------------------------------
+            # Clock Divider
+            # ------------------------------------------
+
+            elif mode == "clock_divider":
+                source_value = float(
+                    request.form.get(
+                        "source_frequency",
+                        "",
+                    )
+                )
+
+                source_unit = request.form.get(
+                    "source_frequency_unit",
+                    "Hz",
+                )
+
+                target_value = float(
+                    request.form.get(
+                        "target_frequency",
+                        "",
+                    )
+                )
+
+                target_unit = request.form.get(
+                    "target_frequency_unit",
+                    "Hz",
+                )
+
+                source_frequency = frequency_to_hz(
+                    source_value,
+                    source_unit,
+                )
+
+                target_frequency = frequency_to_hz(
+                    target_value,
+                    target_unit,
+                )
+
+                result = calculate_clock_divider(
+                    source_frequency,
+                    target_frequency,
+                )
+
+                result["mode"] = mode
+                result["source_frequency"] = source_frequency
+                result["target_frequency"] = target_frequency
+
+            # ------------------------------------------
+            # Counter / Timer
+            # ------------------------------------------
+
+            elif mode == "timer":
+                clock_value = float(
+                    request.form.get(
+                        "clock_frequency",
+                        "",
+                    )
+                )
+
+                clock_unit = request.form.get(
+                    "clock_frequency_unit",
+                    "Hz",
+                )
+
+                time_value = float(
+                    request.form.get(
+                        "target_time",
+                        "",
+                    )
+                )
+
+                time_unit = request.form.get(
+                    "target_time_unit",
+                    "s",
+                )
+
+                clock_frequency = frequency_to_hz(
+                    clock_value,
+                    clock_unit,
+                )
+
+                target_time = time_to_seconds(
+                    time_value,
+                    time_unit,
+                )
+
+                result = calculate_timer(
+                    clock_frequency,
+                    target_time,
+                )
+
+                result["mode"] = mode
+                result["clock_frequency"] = clock_frequency
+                result["target_time"] = target_time
+                result["terminal_count"] = (
+                    result["cycles"] - 1
+                )
+
+            # ------------------------------------------
+            # PWM
+            # ------------------------------------------
+
+            elif mode == "pwm":
+                clock_value = float(
+                    request.form.get(
+                        "clock_frequency",
+                        "",
+                    )
+                )
+
+                clock_unit = request.form.get(
+                    "clock_frequency_unit",
+                    "Hz",
+                )
+
+                target_value = float(
+                    request.form.get(
+                        "target_frequency",
+                        "",
+                    )
+                )
+
+                target_unit = request.form.get(
+                    "target_frequency_unit",
+                    "Hz",
+                )
+
+                duty_cycle = float(
+                    request.form.get(
+                        "duty_cycle",
+                        "",
+                    )
+                )
+
+                clock_frequency = frequency_to_hz(
+                    clock_value,
+                    clock_unit,
+                )
+
+                target_frequency = frequency_to_hz(
+                    target_value,
+                    target_unit,
+                )
+
+                result = calculate_pwm(
+                    clock_frequency,
+                    target_frequency,
+                    duty_cycle,
+                )
+
+                result["mode"] = mode
+                result["clock_frequency"] = clock_frequency
+                result["target_frequency"] = target_frequency
+                result["target_duty_cycle"] = duty_cycle
+
+            else:
+                raise ValueError(
+                    "Invalid clock calculation mode."
+                )
+
+        except ValueError as exc:
+            error = str(exc)
+
+    return render_template(
+        "electrical/clock_timing.html",
+        result=result,
+        error=error,
     )

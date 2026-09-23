@@ -1,4 +1,5 @@
 from math import sqrt
+import math
 
 #----# Ohm's Law #----#
 def calculate_ohms_law(voltage=None, current=None, resistance=None, power=None):
@@ -239,3 +240,265 @@ def calculate_linear_scaling(
         "output_value": output_value,
         "percentage": percentage,
     }
+    
+#----# digital clock #----#     
+def calculate_period(frequency):
+    if frequency <= 0:
+        raise ValueError(
+            "Frequency must be greater than zero."
+        )
+
+    return 1 / frequency
+
+
+def calculate_frequency(period):
+    if period <= 0:
+        raise ValueError(
+            "Period must be greater than zero."
+        )
+
+    return 1 / period
+
+
+def calculate_cycles_to_time(
+    frequency,
+    cycles,
+):
+    if frequency <= 0:
+        raise ValueError(
+            "Frequency must be greater than zero."
+        )
+
+    if cycles < 0:
+        raise ValueError(
+            "Clock cycles cannot be negative."
+        )
+
+    return cycles / frequency
+
+
+def calculate_time_to_cycles(
+    frequency,
+    time,
+):
+    if frequency <= 0:
+        raise ValueError(
+            "Frequency must be greater than zero."
+        )
+
+    if time < 0:
+        raise ValueError(
+            "Time cannot be negative."
+        )
+
+    return frequency * time
+    
+def calculate_clock_divider(
+    source_frequency,
+    target_frequency,
+):
+    if source_frequency <= 0:
+        raise ValueError(
+            "Source frequency must be greater than zero."
+        )
+
+    if target_frequency <= 0:
+        raise ValueError(
+            "Target frequency must be greater than zero."
+        )
+
+    if target_frequency > source_frequency:
+        raise ValueError(
+            "Target frequency cannot exceed "
+            "the source frequency."
+        )
+
+    ideal_divider = (
+        source_frequency / target_frequency
+    )
+
+    divider = max(1, round(ideal_divider))
+
+    actual_frequency = (
+        source_frequency / divider
+    )
+
+    error_hz = (
+        actual_frequency - target_frequency
+    )
+
+    error_percent = (
+        error_hz / target_frequency
+    ) * 100
+
+    error_ppm = (
+        error_hz / target_frequency
+    ) * 1_000_000
+
+    return {
+        "ideal_divider": ideal_divider,
+        "divider": divider,
+        "actual_frequency": actual_frequency,
+        "error_hz": error_hz,
+        "error_percent": error_percent,
+        "error_ppm": error_ppm,
+    }
+    
+def calculate_timer(
+    clock_frequency,
+    target_time,
+):
+    if clock_frequency <= 0:
+        raise ValueError(
+            "Clock frequency must be greater than zero."
+        )
+
+    if target_time <= 0:
+        raise ValueError(
+            "Target time must be greater than zero."
+        )
+
+    ideal_cycles = (
+        clock_frequency * target_time
+    )
+
+    cycles = max(1, round(ideal_cycles))
+
+    actual_time = (
+        cycles / clock_frequency
+    )
+
+    error_seconds = (
+        actual_time - target_time
+    )
+
+    error_percent = (
+        error_seconds / target_time
+    ) * 100
+
+    counter_bits = max(
+        1,
+        math.ceil(math.log2(cycles)),
+    )
+
+    return {
+        "ideal_cycles": ideal_cycles,
+        "cycles": cycles,
+        "counter_bits": counter_bits,
+        "actual_time": actual_time,
+        "error_seconds": error_seconds,
+        "error_percent": error_percent,
+    }
+    
+def calculate_pwm(
+    clock_frequency,
+    target_frequency,
+    duty_cycle,
+):
+    if clock_frequency <= 0:
+        raise ValueError(
+            "Clock frequency must be greater than zero."
+        )
+
+    if target_frequency <= 0:
+        raise ValueError(
+            "PWM frequency must be greater than zero."
+        )
+
+    if target_frequency > clock_frequency:
+        raise ValueError(
+            "PWM frequency cannot exceed "
+            "the clock frequency."
+        )
+
+    if duty_cycle < 0 or duty_cycle > 100:
+        raise ValueError(
+            "Duty cycle must be between 0 and 100."
+        )
+
+    ideal_period_counts = (
+        clock_frequency / target_frequency
+    )
+
+    period_counts = max(
+        1,
+        round(ideal_period_counts),
+    )
+
+    actual_frequency = (
+        clock_frequency / period_counts
+    )
+
+    high_counts = round(
+        period_counts * duty_cycle / 100
+    )
+
+    high_counts = max(
+        0,
+        min(period_counts, high_counts),
+    )
+
+    low_counts = period_counts - high_counts
+
+    actual_duty_cycle = (
+        high_counts / period_counts
+    ) * 100
+
+    frequency_error = (
+        actual_frequency - target_frequency
+    )
+
+    frequency_error_percent = (
+        frequency_error / target_frequency
+    ) * 100
+
+    duty_error = (
+        actual_duty_cycle - duty_cycle
+    )
+
+    counter_bits = max(
+        1,
+        math.ceil(math.log2(period_counts)),
+    )
+
+    return {
+        "ideal_period_counts": ideal_period_counts,
+        "period_counts": period_counts,
+        "high_counts": high_counts,
+        "low_counts": low_counts,
+        "actual_frequency": actual_frequency,
+        "actual_duty_cycle": actual_duty_cycle,
+        "frequency_error": frequency_error,
+        "frequency_error_percent": frequency_error_percent,
+        "duty_error": duty_error,
+        "counter_bits": counter_bits,
+    }
+    
+FREQUENCY_UNITS = {
+    "Hz": 1,
+    "kHz": 1e3,
+    "MHz": 1e6,
+    "GHz": 1e9,
+}
+
+TIME_UNITS = {
+    "s": 1,
+    "ms": 1e-3,
+    "us": 1e-6,
+    "ns": 1e-9,
+    "ps": 1e-12,
+}
+
+
+def frequency_to_hz(value, unit):
+    if unit not in FREQUENCY_UNITS:
+        raise ValueError("Invalid frequency unit.")
+
+    return value * FREQUENCY_UNITS[unit]
+
+
+def time_to_seconds(value, unit):
+    if unit not in TIME_UNITS:
+        raise ValueError("Invalid time unit.")
+
+    return value * TIME_UNITS[unit]

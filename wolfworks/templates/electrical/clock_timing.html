@@ -1,0 +1,906 @@
+{% extends "base.html" %}
+
+{% block title %}
+Digital Clock & Timing | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>Digital Clock & Timing</h1>
+
+<p>
+    Calculate digital clock periods, timing, dividers,
+    counters, and PWM parameters.
+</p>
+
+
+<form method="POST" id="clock-timing-form">
+
+    <!-- ==================================================
+         Calculation Mode
+         ================================================== -->
+
+    <div>
+        <label for="mode">Calculation</label>
+
+        {% set selected_mode =
+            request.form.get('mode', 'frequency_period') %}
+
+        <select id="mode" name="mode">
+
+            <option
+                value="frequency_period"
+                {% if selected_mode == "frequency_period" %}
+                selected
+                {% endif %}
+            >
+                Frequency / Period
+            </option>
+
+            <option
+                value="cycles_time"
+                {% if selected_mode == "cycles_time" %}
+                selected
+                {% endif %}
+            >
+                Clock Cycles / Time
+            </option>
+
+            <option
+                value="clock_divider"
+                {% if selected_mode == "clock_divider" %}
+                selected
+                {% endif %}
+            >
+                Clock Divider
+            </option>
+
+            <option
+                value="timer"
+                {% if selected_mode == "timer" %}
+                selected
+                {% endif %}
+            >
+                Counter / Timer Design
+            </option>
+
+            <option
+                value="pwm"
+                {% if selected_mode == "pwm" %}
+                selected
+                {% endif %}
+            >
+                PWM Timing
+            </option>
+
+        </select>
+    </div>
+
+
+    <!-- ==================================================
+         Frequency / Period
+         ================================================== -->
+
+    <section
+        id="frequency-period-fields"
+        class="clock-mode"
+    >
+
+        <h2>Frequency / Period</h2>
+
+        {% set selected_direction =
+            request.form.get(
+                'direction',
+                'frequency_to_period'
+            )
+        %}
+
+        <div class="radio-group">
+
+            <label class="radio-option">
+                <input
+                    type="radio"
+                    name="direction"
+                    value="frequency_to_period"
+                    {% if selected_direction
+                        == "frequency_to_period" %}
+                    checked
+                    {% endif %}
+                >
+                <span>Frequency → Period</span>
+            </label>
+
+            <label class="radio-option">
+                <input
+                    type="radio"
+                    name="direction"
+                    value="period_to_frequency"
+                    {% if selected_direction
+                        == "period_to_frequency" %}
+                    checked
+                    {% endif %}
+                >
+                <span>Period → Frequency</span>
+            </label>
+
+        </div>
+
+
+        <div id="frequency-input">
+
+            <label for="frequency">Frequency</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    id="frequency"
+                    name="frequency"
+                    value="{{ request.form.get(
+                        'frequency',
+                        ''
+                    ) }}"
+                    placeholder="50"
+                >
+
+                <select
+                    id="frequency_unit"
+                    name="frequency_unit"
+                >
+                    {% set unit =
+                        request.form.get(
+                            'frequency_unit',
+                            'MHz'
+                        )
+                    %}
+
+                    <option value="Hz"
+                        {% if unit == "Hz" %}selected{% endif %}>
+                        Hz
+                    </option>
+
+                    <option value="kHz"
+                        {% if unit == "kHz" %}selected{% endif %}>
+                        kHz
+                    </option>
+
+                    <option value="MHz"
+                        {% if unit == "MHz" %}selected{% endif %}>
+                        MHz
+                    </option>
+
+                    <option value="GHz"
+                        {% if unit == "GHz" %}selected{% endif %}>
+                        GHz
+                    </option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div id="period-input">
+
+            <label for="period">Period</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    id="period"
+                    name="period"
+                    value="{{ request.form.get(
+                        'period',
+                        ''
+                    ) }}"
+                    placeholder="20"
+                >
+
+                <select
+                    id="period_unit"
+                    name="period_unit"
+                >
+                    {% set unit =
+                        request.form.get(
+                            'period_unit',
+                            'ns'
+                        )
+                    %}
+
+                    <option value="s"
+                        {% if unit == "s" %}selected{% endif %}>
+                        s
+                    </option>
+
+                    <option value="ms"
+                        {% if unit == "ms" %}selected{% endif %}>
+                        ms
+                    </option>
+
+                    <option value="us"
+                        {% if unit == "us" %}selected{% endif %}>
+                        µs
+                    </option>
+
+                    <option value="ns"
+                        {% if unit == "ns" %}selected{% endif %}>
+                        ns
+                    </option>
+
+                    <option value="ps"
+                        {% if unit == "ps" %}selected{% endif %}>
+                        ps
+                    </option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         Clock Cycles / Time
+         ================================================== -->
+
+    <section
+        id="cycles-time-fields"
+        class="clock-mode"
+    >
+
+        <h2>Clock Cycles / Time</h2>
+
+        <div class="radio-group">
+
+            <label class="radio-option">
+                <input
+                    type="radio"
+                    name="direction"
+                    value="cycles_to_time"
+                    {% if selected_direction
+                        == "cycles_to_time" %}
+                    checked
+                    {% endif %}
+                >
+                <span>Cycles → Time</span>
+            </label>
+
+            <label class="radio-option">
+                <input
+                    type="radio"
+                    name="direction"
+                    value="time_to_cycles"
+                    {% if selected_direction
+                        == "time_to_cycles" %}
+                    checked
+                    {% endif %}
+                >
+                <span>Time → Cycles</span>
+            </label>
+
+        </div>
+
+
+        <div>
+            <label>Clock Frequency</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="clock_frequency"
+                    value="{{ request.form.get(
+                        'clock_frequency',
+                        ''
+                    ) }}"
+                    placeholder="50"
+                >
+
+                <select name="clock_frequency_unit">
+                    {% set clock_unit =
+                        request.form.get(
+                            'clock_frequency_unit',
+                            'MHz'
+                        )
+                    %}
+
+                    <option value="Hz"
+                        {% if clock_unit == "Hz" %}selected{% endif %}>
+                        Hz
+                    </option>
+
+                    <option value="kHz"
+                        {% if clock_unit == "kHz" %}selected{% endif %}>
+                        kHz
+                    </option>
+
+                    <option value="MHz"
+                        {% if clock_unit == "MHz" %}selected{% endif %}>
+                        MHz
+                    </option>
+
+                    <option value="GHz"
+                        {% if clock_unit == "GHz" %}selected{% endif %}>
+                        GHz
+                    </option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div id="cycles-input">
+
+            <label for="cycles">Clock Cycles</label>
+
+            <input
+                type="number"
+                step="any"
+                id="cycles"
+                name="cycles"
+                value="{{ request.form.get(
+                    'cycles',
+                    ''
+                ) }}"
+                placeholder="12500"
+            >
+
+        </div>
+
+
+        <div id="time-input">
+
+            <label for="time">Time</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    id="time"
+                    name="time"
+                    value="{{ request.form.get(
+                        'time',
+                        ''
+                    ) }}"
+                    placeholder="250"
+                >
+
+                <select name="time_unit">
+                    {% set time_unit =
+                        request.form.get(
+                            'time_unit',
+                            'us'
+                        )
+                    %}
+
+                    <option value="s"
+                        {% if time_unit == "s" %}selected{% endif %}>
+                        s
+                    </option>
+
+                    <option value="ms"
+                        {% if time_unit == "ms" %}selected{% endif %}>
+                        ms
+                    </option>
+
+                    <option value="us"
+                        {% if time_unit == "us" %}selected{% endif %}>
+                        µs
+                    </option>
+
+                    <option value="ns"
+                        {% if time_unit == "ns" %}selected{% endif %}>
+                        ns
+                    </option>
+
+                    <option value="ps"
+                        {% if time_unit == "ps" %}selected{% endif %}>
+                        ps
+                    </option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         Clock Divider
+         ================================================== -->
+
+    <section
+        id="clock-divider-fields"
+        class="clock-mode"
+    >
+
+        <h2>Clock Divider</h2>
+
+        <div>
+            <label>Source Clock</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="source_frequency"
+                    value="{{ request.form.get(
+                        'source_frequency',
+                        ''
+                    ) }}"
+                    placeholder="50"
+                >
+
+                <select name="source_frequency_unit">
+                    <option value="Hz">Hz</option>
+                    <option value="kHz">kHz</option>
+                    <option value="MHz" selected>MHz</option>
+                    <option value="GHz">GHz</option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div>
+            <label>Desired Output Clock</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="target_frequency"
+                    value="{{ request.form.get(
+                        'target_frequency',
+                        ''
+                    ) }}"
+                    placeholder="1"
+                >
+
+                <select name="target_frequency_unit">
+                    <option value="Hz">Hz</option>
+                    <option value="kHz" selected>kHz</option>
+                    <option value="MHz">MHz</option>
+                    <option value="GHz">GHz</option>
+                </select>
+
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         Counter / Timer
+         ================================================== -->
+
+    <section
+        id="timer-fields"
+        class="clock-mode"
+    >
+
+        <h2>Counter / Timer Design</h2>
+
+        <div>
+            <label>Clock Frequency</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="clock_frequency"
+                    placeholder="100"
+                >
+
+                <select name="clock_frequency_unit">
+                    <option value="Hz">Hz</option>
+                    <option value="kHz">kHz</option>
+                    <option value="MHz" selected>MHz</option>
+                    <option value="GHz">GHz</option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div>
+            <label>Desired Delay</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="target_time"
+                    placeholder="10"
+                >
+
+                <select name="target_time_unit">
+                    <option value="s">s</option>
+                    <option value="ms" selected>ms</option>
+                    <option value="us">µs</option>
+                    <option value="ns">ns</option>
+                    <option value="ps">ps</option>
+                </select>
+
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ==================================================
+         PWM
+         ================================================== -->
+
+    <section
+        id="pwm-fields"
+        class="clock-mode"
+    >
+
+        <h2>PWM Timing</h2>
+
+        <div>
+            <label>Clock Frequency</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="clock_frequency"
+                    placeholder="50"
+                >
+
+                <select name="clock_frequency_unit">
+                    <option value="Hz">Hz</option>
+                    <option value="kHz">kHz</option>
+                    <option value="MHz" selected>MHz</option>
+                    <option value="GHz">GHz</option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div>
+            <label>PWM Frequency</label>
+
+            <div class="value-unit-input">
+
+                <input
+                    type="number"
+                    step="any"
+                    name="target_frequency"
+                    placeholder="20"
+                >
+
+                <select name="target_frequency_unit">
+                    <option value="Hz">Hz</option>
+                    <option value="kHz" selected>kHz</option>
+                    <option value="MHz">MHz</option>
+                    <option value="GHz">GHz</option>
+                </select>
+
+            </div>
+        </div>
+
+
+        <div>
+            <label for="duty_cycle">
+                Duty Cycle (%)
+            </label>
+
+            <input
+                type="number"
+                step="any"
+                id="duty_cycle"
+                name="duty_cycle"
+                min="0"
+                max="100"
+                placeholder="25"
+            >
+        </div>
+
+    </section>
+
+
+    <button type="submit">
+        Calculate
+    </button>
+
+</form>
+
+
+<!-- ==================================================
+     Error
+     ================================================== -->
+
+{% if error %}
+
+<div class="error">
+    <strong>Error:</strong>
+    {{ error }}
+</div>
+
+{% endif %}
+
+
+<!-- ==================================================
+     Results
+     ================================================== -->
+
+{% if result %}
+
+<section class="result">
+
+    <h2>Results</h2>
+
+    <table>
+
+        <tr>
+            <th>Quantity</th>
+            <th>Value</th>
+        </tr>
+
+
+        {% if result.mode == "frequency_period" %}
+
+            <tr>
+                <td>Frequency</td>
+                <td>
+                    {{ result.frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Period</td>
+                <td>
+                    {{ result.period|engineering }}s
+                </td>
+            </tr>
+
+
+        {% elif result.mode == "cycles_time" %}
+
+            <tr>
+                <td>Clock Frequency</td>
+                <td>
+                    {{ result.clock_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Clock Cycles</td>
+                <td>
+                    {{ "%.6g"|format(result.cycles) }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Time</td>
+                <td>
+                    {{ result.time|engineering }}s
+                </td>
+            </tr>
+
+
+        {% elif result.mode == "clock_divider" %}
+
+            <tr>
+                <td>Source Clock</td>
+                <td>
+                    {{ result.source_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Requested Clock</td>
+                <td>
+                    {{ result.target_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ideal Divider</td>
+                <td>
+                    {{ "%.6g"|format(result.ideal_divider) }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Integer Divider</td>
+                <td>
+                    {{ result.divider }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Actual Clock</td>
+                <td>
+                    {{ result.actual_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Frequency Error</td>
+                <td>
+                    {{ "%.6g"|format(result.error_percent) }} %
+                </td>
+            </tr>
+
+            <tr>
+                <td>Error</td>
+                <td>
+                    {{ "%.6g"|format(result.error_ppm) }} ppm
+                </td>
+            </tr>
+
+
+        {% elif result.mode == "timer" %}
+
+            <tr>
+                <td>Clock Frequency</td>
+                <td>
+                    {{ result.clock_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Requested Time</td>
+                <td>
+                    {{ result.target_time|engineering }}s
+                </td>
+            </tr>
+
+            <tr>
+                <td>Required Cycles</td>
+                <td>
+                    {{ result.cycles }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Terminal Count</td>
+                <td>
+                    {{ result.terminal_count }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Counter Width</td>
+                <td>
+                    {{ result.counter_bits }} bits
+                </td>
+            </tr>
+
+            <tr>
+                <td>Actual Time</td>
+                <td>
+                    {{ result.actual_time|engineering }}s
+                </td>
+            </tr>
+
+            <tr>
+                <td>Timing Error</td>
+                <td>
+                    {{ "%.6g"|format(result.error_percent) }} %
+                </td>
+            </tr>
+
+
+        {% elif result.mode == "pwm" %}
+
+            <tr>
+                <td>Clock Frequency</td>
+                <td>
+                    {{ result.clock_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Requested PWM Frequency</td>
+                <td>
+                    {{ result.target_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Actual PWM Frequency</td>
+                <td>
+                    {{ result.actual_frequency|engineering }}Hz
+                </td>
+            </tr>
+
+            <tr>
+                <td>Period Counts</td>
+                <td>
+                    {{ result.period_counts }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>HIGH Counts</td>
+                <td>
+                    {{ result.high_counts }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>LOW Counts</td>
+                <td>
+                    {{ result.low_counts }}
+                </td>
+            </tr>
+
+            <tr>
+                <td>Requested Duty Cycle</td>
+                <td>
+                    {{ "%.6g"|format(
+                        result.target_duty_cycle
+                    ) }} %
+                </td>
+            </tr>
+
+            <tr>
+                <td>Actual Duty Cycle</td>
+                <td>
+                    {{ "%.6g"|format(
+                        result.actual_duty_cycle
+                    ) }} %
+                </td>
+            </tr>
+
+            <tr>
+                <td>Counter Width</td>
+                <td>
+                    {{ result.counter_bits }} bits
+                </td>
+            </tr>
+
+            <tr>
+                <td>Frequency Error</td>
+                <td>
+                    {{ "%.6g"|format(
+                        result.frequency_error_percent
+                    ) }} %
+                </td>
+            </tr>
+
+            <tr>
+                <td>Duty Cycle Error</td>
+                <td>
+                    {{ "%.6g"|format(
+                        result.duty_error
+                    ) }} %
+                </td>
+            </tr>
+
+        {% endif %}
+
+    </table>
+
+</section>
+
+{% endif %}
+
+
+<script
+    src="{{ url_for(
+        'static',
+        filename='js/clock_timing.js'
+    ) }}"
+></script>
+
+{% endblock %}
