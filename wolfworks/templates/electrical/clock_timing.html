@@ -440,12 +440,31 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     placeholder="50"
                 >
 
-                <select name="source_frequency_unit">
-                    <option value="Hz">Hz</option>
-                    <option value="kHz">kHz</option>
-                    <option value="MHz" selected>MHz</option>
-                    <option value="GHz">GHz</option>
-                </select>
+                {% set source_unit =
+					request.form.get(
+						'source_frequency_unit',
+						'MHz'
+					)
+				%}
+
+				<select name="source_frequency_unit">
+					<option value="Hz"
+						{% if source_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+					<option value="kHz"
+						{% if source_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+					<option value="MHz"
+						{% if source_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+					<option value="GHz"
+						{% if source_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
 
             </div>
         </div>
@@ -467,13 +486,31 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     placeholder="1"
                 >
 
-                <select name="target_frequency_unit">
-                    <option value="Hz">Hz</option>
-                    <option value="kHz" selected>kHz</option>
-                    <option value="MHz">MHz</option>
-                    <option value="GHz">GHz</option>
-                </select>
+                {% set target_unit =
+					request.form.get(
+						'target_frequency_unit',
+						'kHz'
+					)
+				%}
 
+				<select name="target_frequency_unit">
+					<option value="Hz"
+						{% if target_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+					<option value="kHz"
+						{% if target_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+					<option value="MHz"
+						{% if target_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+					<option value="GHz"
+						{% if target_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
             </div>
         </div>
 
@@ -500,16 +537,39 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     type="number"
                     step="any"
                     name="clock_frequency"
+					value="{% if selected_mode == 'timer' %}{{ request.form.get('clock_frequency', '') }}{% endif %}"
                     placeholder="100"
                 >
 
-                <select name="clock_frequency_unit">
-                    <option value="Hz">Hz</option>
-                    <option value="kHz">kHz</option>
-                    <option value="MHz" selected>MHz</option>
-                    <option value="GHz">GHz</option>
-                </select>
+                {% if selected_mode == "timer" %}
+					{% set timer_clock_unit =
+						request.form.get(
+							'clock_frequency_unit',
+							'MHz'
+						)
+					%}
+				{% else %}
+					{% set timer_clock_unit = "MHz" %}
+				{% endif %}
 
+				<select name="clock_frequency_unit">
+					<option value="Hz"
+						{% if timer_clock_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+					<option value="kHz"
+						{% if timer_clock_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+					<option value="MHz"
+						{% if timer_clock_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+					<option value="GHz"
+						{% if timer_clock_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
             </div>
         </div>
 
@@ -523,16 +583,39 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     type="number"
                     step="any"
                     name="target_time"
+					value="{{ request.form.get('target_time', '') }}"
                     placeholder="10"
                 >
 
-                <select name="target_time_unit">
-                    <option value="s">s</option>
-                    <option value="ms" selected>ms</option>
-                    <option value="us">µs</option>
-                    <option value="ns">ns</option>
-                    <option value="ps">ps</option>
-                </select>
+                {% set target_time_unit =
+					request.form.get(
+						'target_time_unit',
+						'ms'
+					)
+				%}
+
+				<select name="target_time_unit">
+					<option value="s"
+						{% if target_time_unit == "s" %}selected{% endif %}>
+						s
+					</option>
+					<option value="ms"
+						{% if target_time_unit == "ms" %}selected{% endif %}>
+						ms
+					</option>
+					<option value="us"
+						{% if target_time_unit == "us" %}selected{% endif %}>
+						µs
+					</option>
+					<option value="ns"
+						{% if target_time_unit == "ns" %}selected{% endif %}>
+						ns
+					</option>
+					<option value="ps"
+						{% if target_time_unit == "ps" %}selected{% endif %}>
+						ps
+					</option>
+				</select>
 
             </div>
         </div>
@@ -560,16 +643,39 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     type="number"
                     step="any"
                     name="clock_frequency"
+					value="{% if selected_mode == 'pwm' %}{{ request.form.get('clock_frequency', '') }}{% endif %}"
                     placeholder="50"
                 >
 
-                <select name="clock_frequency_unit">
-                    <option value="Hz">Hz</option>
-                    <option value="kHz">kHz</option>
-                    <option value="MHz" selected>MHz</option>
-                    <option value="GHz">GHz</option>
-                </select>
+                {% if selected_mode == "pwm" %}
+					{% set pwm_clock_unit =
+						request.form.get(
+							'clock_frequency_unit',
+							'MHz'
+						)
+					%}
+				{% else %}
+					{% set pwm_clock_unit = "MHz" %}
+				{% endif %}
 
+				<select name="clock_frequency_unit">
+					<option value="Hz"
+						{% if pwm_clock_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+					<option value="kHz"
+						{% if pwm_clock_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+					<option value="MHz"
+						{% if pwm_clock_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+					<option value="GHz"
+						{% if pwm_clock_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
             </div>
         </div>
 
@@ -583,15 +689,35 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     type="number"
                     step="any"
                     name="target_frequency"
+					value="{{ request.form.get('target_frequency', '') }}"
                     placeholder="20"
                 >
 
-                <select name="target_frequency_unit">
-                    <option value="Hz">Hz</option>
-                    <option value="kHz" selected>kHz</option>
-                    <option value="MHz">MHz</option>
-                    <option value="GHz">GHz</option>
-                </select>
+                {% set pwm_target_unit =
+					request.form.get(
+						'target_frequency_unit',
+						'kHz'
+					)
+				%}
+
+				<select name="target_frequency_unit">
+					<option value="Hz"
+						{% if pwm_target_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+					<option value="kHz"
+						{% if pwm_target_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+					<option value="MHz"
+						{% if pwm_target_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+					<option value="GHz"
+						{% if pwm_target_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
 
             </div>
         </div>
@@ -609,6 +735,7 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                 name="duty_cycle"
                 min="0"
                 max="100"
+				value="{{ request.form.get('duty_cycle', '') }}"
                 placeholder="25"
             >
         </div>

@@ -220,3 +220,29 @@ def test_route_rejects_zero_frequency(client):
 
     assert response.status_code == 200
     assert b"Error:" in response.data
+    
+    
+    
+    
+def test_route_preserves_pwm_form_values(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "pwm",
+            "clock_frequency": "73.5",
+            "clock_frequency_unit": "MHz",
+            "target_frequency": "17.25",
+            "target_frequency_unit": "kHz",
+            "duty_cycle": "37.5",
+        },
+    )
+
+    assert response.status_code == 200
+
+    html = response.get_data(as_text=True)
+
+    assert 'value="73.5"' in html
+    assert 'value="17.25"' in html
+    assert 'value="37.5"' in html
+
+    assert 'value="pwm"' in html
