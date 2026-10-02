@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Format Reference | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>File Format Reference</h1>
+
+<p>
+    Compare common structured data, configuration,
+    database, spreadsheet, and engineering file formats.
+</p>
+
+
+<table>
+
+    <thead>
+        <tr>
+            <th>Format</th>
+            <th>Extensions</th>
+            <th>Category</th>
+            <th>Storage</th>
+            <th>Human Readable</th>
+            <th>Comments</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for format_id, format_data
+            in file_formats.items() %}
+
+        <tr>
+
+            <td>
+                <a href="{{
+                    url_for(
+                        'file_formats.format_detail',
+                        format_id=format_id
+                    )
+                }}">
+                    {{ format_data.name }}
+                </a>
+            </td>
+
+            <td>
+                {{ format_data.extensions | join(", ") }}
+            </td>
+
+            <td>
+                {{ format_data.category }}
+            </td>
+
+            <td>
+                {{ format_data.storage }}
+            </td>
+
+            <td>
+                {% if format_data.human_readable %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+
+            <td>
+                {% if format_data.supports_comments %}
+                    Yes
+                {% else %}
+                    No
+                {% endif %}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+
+<p>
+    <a href="{{ url_for('file_formats.index') }}">
+        Back to File Formats
+    </a>
+</p>
+
+{% endblock %}

@@ -30,5 +30,8 @@ def create_app(test_config=None):
 
     from wolfworks.plc import plc_bp
     app.register_blueprint(plc_bp)
+    
+    from wolfworks.file_formats import file_formats_bp
+    app.register_blueprint(file_formats_bp)
 
     return app

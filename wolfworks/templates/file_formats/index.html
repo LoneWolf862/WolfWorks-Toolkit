@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+File Formats | WolfWorks Engineering Toolkit
+{% endblock %}
+
+
+{% block content %}
+
+<h1>File Formats</h1>
+
+<p>
+    Inspect, compare, validate, and convert common
+    engineering and development file formats.
+</p>
+
+
+<h2>Tools</h2>
+
+<ul>
+    <li>
+        <a href="{{ url_for('file_formats.reference') }}">
+			<strong>Format Reference</strong>
+		</a>
+        — Compare common file formats and their uses.
+    </li>
+
+    <li>
+        <strong>Data Inspector</strong>
+        — Inspect structured text and identify its format.
+    </li>
+
+    <li>
+        <strong>JSON Tools</strong>
+        — Validate, format, and inspect JSON data.
+    </li>
+
+    <li>
+        <strong>CSV / TSV Tools</strong>
+        — Inspect and convert tabular data.
+    </li>
+
+    <li>
+        <strong>Format Converter</strong>
+        — Convert compatible structured data formats.
+    </li>
+</ul>
+
+{% endblock %}

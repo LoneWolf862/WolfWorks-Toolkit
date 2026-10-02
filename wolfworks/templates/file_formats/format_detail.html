@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+{{ format_data.name }} | File Format Reference
+{% endblock %}
+
+
+{% block content %}
+
+<h1>{{ format_data.name }}</h1>
+
+<h2>{{ format_data.full_name }}</h2>
+
+
+<table>
+
+    <tr>
+        <th>Extensions</th>
+        <td>
+            {{ format_data.extensions | join(", ") }}
+        </td>
+    </tr>
+
+    <tr>
+        <th>Category</th>
+        <td>
+            {{ format_data.category }}
+        </td>
+    </tr>
+
+    <tr>
+        <th>Storage</th>
+        <td>
+            {{ format_data.storage }}
+        </td>
+    </tr>
+
+    <tr>
+        <th>Human Readable</th>
+        <td>
+            {% if format_data.human_readable %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </td>
+    </tr>
+
+    <tr>
+        <th>Supports Comments</th>
+        <td>
+            {% if format_data.supports_comments %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </td>
+    </tr>
+
+</table>
+
+
+<h2>Common Uses</h2>
+
+<ul>
+
+    {% for use in format_data.common_uses %}
+
+    <li>
+        {{ use }}
+    </li>
+
+    {% endfor %}
+
+</ul>
+
+
+<p>
+    <a href="{{
+        url_for('file_formats.reference')
+    }}">
+        Back to Format Reference
+    </a>
+</p>
+
+{% endblock %}
