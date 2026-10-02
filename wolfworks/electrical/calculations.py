@@ -502,3 +502,115 @@ def time_to_seconds(value, unit):
         raise ValueError("Invalid time unit.")
 
     return value * TIME_UNITS[unit]
+    
+    
+#----# Uart #----# 
+    
+    
+def uart_baud_rate(
+    clock_frequency,
+    target_baud,
+    oversampling=16,
+):
+    """
+    Calculate UART baud rate using an integer clock divider.
+
+    Returns the ideal divider, selected integer divider,
+    actual baud rate, baud error, and bit period.
+    """
+
+    if clock_frequency <= 0:
+        raise ValueError(
+            "Clock frequency must be greater than zero."
+        )
+
+    if target_baud <= 0:
+        raise ValueError(
+            "Target baud rate must be greater than zero."
+        )
+
+    if oversampling <= 0:
+        raise ValueError(
+            "Oversampling must be greater than zero."
+        )
+
+    ideal_divider = (
+        clock_frequency
+        / (oversampling * target_baud)
+    )
+
+    divider = round(ideal_divider)
+
+    if divider < 1:
+        raise ValueError(
+            "Target baud rate is too high for this clock "
+            "and oversampling setting."
+        )
+
+    actual_baud = (
+        clock_frequency
+        / (oversampling * divider)
+    )
+
+    baud_error = actual_baud - target_baud
+
+    baud_error_percent = (
+        baud_error
+        / target_baud
+        * 100
+    )
+
+    bit_period = 1 / actual_baud
+
+    return {
+        "ideal_divider": ideal_divider,
+        "divider": divider,
+        "actual_baud": actual_baud,
+        "baud_error": baud_error,
+        "baud_error_percent": baud_error_percent,
+        "bit_period": bit_period,
+    }
+    
+def uart_frame_timing(
+    baud_rate,
+    data_bits=8,
+    parity=False,
+    stop_bits=1,
+):
+    """
+    Calculate UART frame timing and theoretical throughput.
+    """
+
+    if baud_rate <= 0:
+        raise ValueError(
+            "Baud rate must be greater than zero."
+        )
+
+    if data_bits <= 0:
+        raise ValueError(
+            "Data bits must be greater than zero."
+        )
+
+    if stop_bits <= 0:
+        raise ValueError(
+            "Stop bits must be greater than zero."
+        )
+
+    parity_bits = 1 if parity else 0
+
+    bits_per_frame = (
+        1
+        + data_bits
+        + parity_bits
+        + stop_bits
+    )
+
+    frame_time = bits_per_frame / baud_rate
+
+    frames_per_second = baud_rate / bits_per_frame
+
+    return {
+        "bits_per_frame": bits_per_frame,
+        "frame_time": frame_time,
+        "frames_per_second": frames_per_second,
+    }

@@ -246,3 +246,99 @@ def test_route_preserves_pwm_form_values(client):
     assert 'value="37.5"' in html
 
     assert 'value="pwm"' in html
+    
+    
+    
+    
+def test_route_uart_baud(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "uart",
+            "uart_clock_frequency": "16",
+            "uart_clock_frequency_unit": "MHz",
+            "target_baud": "115200",
+            "oversampling": "16",
+            "data_bits": "8",
+            "parity": "none",
+            "stop_bits": "1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b"111111" in response.data
+
+
+def test_route_uart_exact_baud(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "uart",
+            "uart_clock_frequency": "16",
+            "uart_clock_frequency_unit": "MHz",
+            "target_baud": "125000",
+            "oversampling": "16",
+            "data_bits": "8",
+            "parity": "none",
+            "stop_bits": "1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b"125000" in response.data
+
+
+def test_route_uart_with_parity(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "uart",
+            "uart_clock_frequency": "16",
+            "uart_clock_frequency_unit": "MHz",
+            "target_baud": "125000",
+            "oversampling": "16",
+            "data_bits": "8",
+            "parity": "even",
+            "stop_bits": "1",
+        },
+    )
+
+    assert response.status_code == 200
+
+
+def test_route_uart_rejects_zero_clock(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "uart",
+            "uart_clock_frequency": "0",
+            "uart_clock_frequency_unit": "MHz",
+            "target_baud": "115200",
+            "oversampling": "16",
+            "data_bits": "8",
+            "parity": "none",
+            "stop_bits": "1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b"greater than zero" in response.data
+
+
+def test_route_uart_rejects_zero_baud(client):
+    response = client.post(
+        "/electrical/clock-timing/",
+        data={
+            "mode": "uart",
+            "uart_clock_frequency": "16",
+            "uart_clock_frequency_unit": "MHz",
+            "target_baud": "0",
+            "oversampling": "16",
+            "data_bits": "8",
+            "parity": "none",
+            "stop_bits": "1",
+        },
+    )
+
+    assert response.status_code == 200
+    assert b"greater than zero" in response.data

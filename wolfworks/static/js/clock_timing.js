@@ -1,32 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
     const modeSelect = document.getElementById("mode");
 
-    const modes = {
-        frequency_period:
-            document.getElementById(
-                "frequency-period-fields"
-            ),
+	const modes = {
+		frequency_period:
+			document.getElementById(
+				"frequency-period-fields"
+			),
 
-        cycles_time:
-            document.getElementById(
-                "cycles-time-fields"
-            ),
+		cycles_time:
+			document.getElementById(
+				"cycles-time-fields"
+			),
 
-        clock_divider:
-            document.getElementById(
-                "clock-divider-fields"
-            ),
+		clock_divider:
+			document.getElementById(
+				"clock-divider-fields"
+			),
 
-        timer:
-            document.getElementById(
-                "timer-fields"
-            ),
+		timer:
+			document.getElementById(
+				"timer-fields"
+			),
 
-        pwm:
-            document.getElementById(
-                "pwm-fields"
-            ),
-    };
+		pwm:
+			document.getElementById(
+				"pwm-fields"
+			),
+
+		uart:
+			document.getElementById(
+				"uart-fields"
+			),
+	};
 
 
     function setSectionEnabled(section, enabled) {

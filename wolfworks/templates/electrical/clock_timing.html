@@ -74,6 +74,14 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                 PWM Timing
             </option>
 
+			<option
+				value="uart"
+				{% if selected_mode == "uart" %}
+				selected
+				{% endif %}
+			>
+				UART Baud Rate
+			</option>
         </select>
     </div>
 
@@ -742,6 +750,229 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
 
     </section>
 
+	<!-- ==================================================
+		 UART Baud Rate
+		 ================================================== -->
+
+	<section
+		id="uart-fields"
+		class="clock-mode"
+	>
+
+		<h2>UART Baud Rate</h2>
+
+		<p>
+			Calculate the achievable UART baud rate,
+			integer divider, timing error, and frame timing.
+		</p>
+
+
+		<div>
+			<label for="uart_clock_frequency">
+				Peripheral Clock Frequency
+			</label>
+
+			<div class="value-unit-input">
+
+				<input
+					type="number"
+					step="any"
+					id="uart_clock_frequency"
+					name="uart_clock_frequency"
+					value="{% if selected_mode == 'uart' %}{{ request.form.get('uart_clock_frequency', '') }}{% endif %}"
+					placeholder="16"
+				>
+
+				{% if selected_mode == "uart" %}
+					{% set uart_clock_unit =
+						request.form.get(
+							'uart_clock_frequency_unit',
+							'MHz'
+						)
+					%}
+				{% else %}
+					{% set uart_clock_unit = "MHz" %}
+				{% endif %}
+
+				<select
+					id="uart_clock_frequency_unit"
+					name="uart_clock_frequency_unit"
+				>
+					<option value="Hz"
+						{% if uart_clock_unit == "Hz" %}selected{% endif %}>
+						Hz
+					</option>
+
+					<option value="kHz"
+						{% if uart_clock_unit == "kHz" %}selected{% endif %}>
+						kHz
+					</option>
+
+					<option value="MHz"
+						{% if uart_clock_unit == "MHz" %}selected{% endif %}>
+						MHz
+					</option>
+
+					<option value="GHz"
+						{% if uart_clock_unit == "GHz" %}selected{% endif %}>
+						GHz
+					</option>
+				</select>
+
+			</div>
+		</div>
+
+
+		<div>
+			<label for="target_baud">
+				Target Baud Rate
+			</label>
+
+			<input
+				type="number"
+				step="any"
+				id="target_baud"
+				name="target_baud"
+				value="{% if selected_mode == 'uart' %}{{ request.form.get('target_baud', '') }}{% endif %}"
+				placeholder="115200"
+			>
+		</div>
+
+
+		<div>
+			<label for="oversampling">
+				Oversampling
+			</label>
+
+			{% set uart_oversampling =
+				request.form.get('oversampling', '16')
+			%}
+
+			<select
+				id="oversampling"
+				name="oversampling"
+			>
+				<option value="16"
+					{% if uart_oversampling == "16" %}selected{% endif %}>
+					16×
+				</option>
+
+				<option value="8"
+					{% if uart_oversampling == "8" %}selected{% endif %}>
+					8×
+				</option>
+
+				<option value="4"
+					{% if uart_oversampling == "4" %}selected{% endif %}>
+					4×
+				</option>
+			</select>
+		</div>
+
+
+		<div>
+			<label for="data_bits">
+				Data Bits
+			</label>
+
+			{% set uart_data_bits =
+				request.form.get('data_bits', '8')
+			%}
+
+			<select
+				id="data_bits"
+				name="data_bits"
+			>
+				<option value="5"
+					{% if uart_data_bits == "5" %}selected{% endif %}>
+					5
+				</option>
+
+				<option value="6"
+					{% if uart_data_bits == "6" %}selected{% endif %}>
+					6
+				</option>
+
+				<option value="7"
+					{% if uart_data_bits == "7" %}selected{% endif %}>
+					7
+				</option>
+
+				<option value="8"
+					{% if uart_data_bits == "8" %}selected{% endif %}>
+					8
+				</option>
+
+				<option value="9"
+					{% if uart_data_bits == "9" %}selected{% endif %}>
+					9
+				</option>
+			</select>
+		</div>
+
+
+		<div>
+			<label for="parity">
+				Parity
+			</label>
+
+			{% set uart_parity =
+				request.form.get('parity', 'none')
+			%}
+
+			<select
+				id="parity"
+				name="parity"
+			>
+				<option value="none"
+					{% if uart_parity == "none" %}selected{% endif %}>
+					None
+				</option>
+
+				<option value="even"
+					{% if uart_parity == "even" %}selected{% endif %}>
+					Even
+				</option>
+
+				<option value="odd"
+					{% if uart_parity == "odd" %}selected{% endif %}>
+					Odd
+				</option>
+			</select>
+		</div>
+
+
+		<div>
+			<label for="stop_bits">
+				Stop Bits
+			</label>
+
+			{% set uart_stop_bits =
+				request.form.get('stop_bits', '1')
+			%}
+
+			<select
+				id="stop_bits"
+				name="stop_bits"
+			>
+				<option value="1"
+					{% if uart_stop_bits == "1" %}selected{% endif %}>
+					1
+				</option>
+
+				<option value="1.5"
+					{% if uart_stop_bits == "1.5" %}selected{% endif %}>
+					1.5
+				</option>
+
+				<option value="2"
+					{% if uart_stop_bits == "2" %}selected{% endif %}>
+					2
+				</option>
+			</select>
+		</div>
+
+	</section>
 
     <button type="submit">
         Calculate
@@ -1013,6 +1244,111 @@ Digital Clock & Timing | WolfWorks Engineering Toolkit
                     ) }} %
                 </td>
             </tr>
+
+		{% elif result.mode == "uart" %}
+
+			<tr>
+				<td>Peripheral Clock</td>
+				<td>
+					{{ result.clock_frequency|engineering }}Hz
+				</td>
+			</tr>
+
+			<tr>
+				<td>Target Baud Rate</td>
+				<td>
+					{{ "%.6g"|format(result.target_baud) }} baud
+				</td>
+			</tr>
+
+			<tr>
+				<td>Oversampling</td>
+				<td>
+					{{ result.oversampling }}×
+				</td>
+			</tr>
+
+			<tr>
+				<td>Ideal Divider</td>
+				<td>
+					{{ "%.6g"|format(result.ideal_divider) }}
+				</td>
+			</tr>
+
+			<tr>
+				<td>Integer Divider</td>
+				<td>
+					{{ result.divider }}
+				</td>
+			</tr>
+
+			<tr>
+				<td>Actual Baud Rate</td>
+				<td>
+					{{ "%.6f"|format(result.actual_baud) }} baud
+				</td>
+			</tr>
+
+			<tr>
+				<td>Baud Error</td>
+				<td>
+					{{ "%.6f"|format(result.baud_error) }} baud
+				</td>
+			</tr>
+
+			<tr>
+				<td>Baud Error</td>
+				<td>
+					{{ "%.4f"|format(
+						result.baud_error_percent
+					) }} %
+				</td>
+			</tr>
+
+			<tr>
+				<td>Bit Period</td>
+				<td>
+					{{ result.bit_period|engineering }}s
+				</td>
+			</tr>
+
+			<tr>
+				<td>UART Configuration</td>
+				<td>
+					{{ result.data_bits }}-
+					{% if result.parity == "none" %}
+						N
+					{% elif result.parity == "even" %}
+						E
+					{% else %}
+						O
+					{% endif %}
+					-{{ "%.6g"|format(result.stop_bits) }}
+				</td>
+			</tr>
+
+			<tr>
+				<td>Bits per Frame</td>
+				<td>
+					{{ "%.6g"|format(result.bits_per_frame) }}
+				</td>
+			</tr>
+
+			<tr>
+				<td>Frame Time</td>
+				<td>
+					{{ result.frame_time|engineering }}s
+				</td>
+			</tr>
+
+			<tr>
+				<td>Maximum Frame Rate</td>
+				<td>
+					{{ "%.6f"|format(
+						result.frames_per_second
+					) }} frames/s
+				</td>
+			</tr>
 
         {% endif %}
 

@@ -10,6 +10,8 @@ from wolfworks.electrical.calculations import (
     calculate_pwm,
     frequency_to_hz,
     time_to_seconds,
+    uart_baud_rate,
+    uart_frame_timing,
 )
 
 
@@ -376,4 +378,114 @@ def test_time_to_seconds_rejects_invalid_unit():
         time_to_seconds(
             20,
             "minutes",
+        )
+        
+def test_uart_baud_exact():
+    result = uart_baud_rate(
+        clock_frequency=16_000_000,
+        target_baud=125_000,
+        oversampling=16,
+    )
+
+    assert result["ideal_divider"] == 8
+    assert result["divider"] == 8
+    assert result["actual_baud"] == 125_000
+    assert result["baud_error"] == 0
+    assert result["baud_error_percent"] == 0
+
+
+def test_uart_baud_approximate():
+    result = uart_baud_rate(
+        clock_frequency=16_000_000,
+        target_baud=115_200,
+        oversampling=16,
+    )
+
+    assert result["divider"] == 9
+    assert result["actual_baud"] == pytest.approx(
+        111_111.111,
+        rel=1e-5,
+    )
+
+    assert result["baud_error_percent"] == pytest.approx(
+        -3.549,
+        rel=1e-3,
+    )
+
+
+def test_uart_bit_period():
+    result = uart_baud_rate(
+        clock_frequency=16_000_000,
+        target_baud=125_000,
+        oversampling=16,
+    )
+
+    assert result["bit_period"] == pytest.approx(
+        8e-6
+    )
+
+
+def test_uart_frame_8n1():
+    result = uart_frame_timing(
+        baud_rate=115_200,
+        data_bits=8,
+        parity=False,
+        stop_bits=1,
+    )
+
+    assert result["bits_per_frame"] == 10
+
+    assert result["frame_time"] == pytest.approx(
+        10 / 115_200
+    )
+
+    assert result["frames_per_second"] == pytest.approx(
+        11_520
+    )
+
+
+def test_uart_frame_with_parity():
+    result = uart_frame_timing(
+        baud_rate=115_200,
+        data_bits=8,
+        parity=True,
+        stop_bits=1,
+    )
+
+    assert result["bits_per_frame"] == 11
+
+
+def test_uart_rejects_zero_clock():
+    with pytest.raises(ValueError):
+        uart_baud_rate(
+            clock_frequency=0,
+            target_baud=115_200,
+            oversampling=16,
+        )
+
+
+def test_uart_rejects_zero_baud():
+    with pytest.raises(ValueError):
+        uart_baud_rate(
+            clock_frequency=16_000_000,
+            target_baud=0,
+            oversampling=16,
+        )
+
+
+def test_uart_rejects_zero_oversampling():
+    with pytest.raises(ValueError):
+        uart_baud_rate(
+            clock_frequency=16_000_000,
+            target_baud=115_200,
+            oversampling=0,
+        )
+
+
+def test_uart_rejects_impossible_baud():
+    with pytest.raises(ValueError):
+        uart_baud_rate(
+            clock_frequency=1_000_000,
+            target_baud=1_000_000,
+            oversampling=16,
         )

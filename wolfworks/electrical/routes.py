@@ -17,6 +17,8 @@ from wolfworks.electrical.calculations import (
     calculate_pwm,
     frequency_to_hz,
     time_to_seconds,
+    uart_baud_rate,
+    uart_frame_timing,
 )
 
 
@@ -579,6 +581,86 @@ def clock_timing():
                 result["clock_frequency"] = clock_frequency
                 result["target_frequency"] = target_frequency
                 result["target_duty_cycle"] = duty_cycle
+
+            # ------------------------------------------
+            # UART Baud Rate
+            # ------------------------------------------
+
+            elif mode == "uart":
+                clock_value = float(
+                    request.form.get(
+                        "uart_clock_frequency",
+                        "",
+                    )
+                )
+
+                clock_unit = request.form.get(
+                    "uart_clock_frequency_unit",
+                    "Hz",
+                )
+
+                target_baud = float(
+                    request.form.get(
+                        "target_baud",
+                        "",
+                    )
+                )
+
+                oversampling = int(
+                    request.form.get(
+                        "oversampling",
+                        "16",
+                    )
+                )
+
+                data_bits = int(
+                    request.form.get(
+                        "data_bits",
+                        "8",
+                    )
+                )
+
+                parity = request.form.get(
+                    "parity",
+                    "none",
+                )
+
+                stop_bits = float(
+                    request.form.get(
+                        "stop_bits",
+                        "1",
+                    )
+                )
+
+                clock_frequency = frequency_to_hz(
+                    clock_value,
+                    clock_unit,
+                )
+
+                baud_result = uart_baud_rate(
+                    clock_frequency,
+                    target_baud,
+                    oversampling,
+                )
+
+                frame_result = uart_frame_timing(
+                    baud_result["actual_baud"],
+                    data_bits,
+                    parity != "none",
+                    stop_bits,
+                )
+
+                result = {
+                    "mode": mode,
+                    "clock_frequency": clock_frequency,
+                    "target_baud": target_baud,
+                    "oversampling": oversampling,
+                    "data_bits": data_bits,
+                    "parity": parity,
+                    "stop_bits": stop_bits,
+                    **baud_result,
+                    **frame_result,
+                }
 
             else:
                 raise ValueError(
